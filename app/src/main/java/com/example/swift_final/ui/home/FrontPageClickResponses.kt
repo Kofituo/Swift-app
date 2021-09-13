@@ -38,6 +38,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.constraintlayout.compose.Dimension
 import androidx.core.content.getSystemService
 import androidx.core.view.GravityCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -65,81 +67,113 @@ fun OnAddUrlClicked(showDialog: Boolean, setShowDialog: (Boolean) -> Unit) {
                 .wrapContentHeight()
                 .border(textFieldBorder(width = OutlineWidth.dp), roundedCornerShape)
                 .background(color = MaterialTheme.colors.surface, roundedCornerShape)
-                .padding(18.dp, 18.dp, 18.dp, 10.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+            //.padding(18.dp, 18.dp, 18.dp, 10.dp),
         ) {
-            Text(text = stringResource(id = R.string.add_url_title))
-            VerticalSpacer(space = 15)
-            AddressField()
-            VerticalSpacer(space = 18)
-            checkState = useAuth(Modifier.align(Alignment.Start))
-            VerticalSpacer(space = 16)
-            OutlinedTextField(
-                value = run {
-                    if (!checkBoxEnabled(checkState)) userName = ""
-                    userName
-                },
-                onValueChange = { userName = it },
-                modifier = Modifier.fillMaxWidth(),
-                label = { Text(text = stringResource(id = R.string.username)) },
-                shape = textFieldShape,
-                enabled = checkBoxEnabled(checkState)
-            )
-            VerticalSpacer(space = 16)
-            var showPassword by remember { mutableStateOf(false) }
-            OutlinedTextField(
-                value = run {
-                    if (!checkBoxEnabled(checkState)) password = ""
-                    password
-                },
-                onValueChange = { password = it },
-                modifier = Modifier.fillMaxWidth(),
-                label = { Text(text = stringResource(id = R.string.password)) },
-                shape = textFieldShape,
-                enabled = checkBoxEnabled(checkState),
-                visualTransformation = if (showPassword) VisualTransformation.None else PasswordVisualTransformation(),
-                trailingIcon = {
-                    //TODO animate between the 2 icons
-                    IconButton(onClick = { showPassword = !showPassword }) {
-                        Icon(
-                            imageVector = if (showPassword) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
-                            contentDescription = stringResource(id = R.string.toggle_password)
-                        )
+            ConstraintLayout(modifier = Modifier.fillMaxWidth()) {
+                val topGuideline = createGuidelineFromTop(0.035f)
+                val startGuide = createGuidelineFromStart(0.07f)
+                val (title, urlBox, useAuth, usernameBox, passwordBox, okButton) = createRefs()
+                Text(
+                    text = stringResource(id = R.string.add_url_title),
+                    modifier = Modifier.constrainAs(title) {
+                        end.linkTo(parent.end)
+                        start.linkTo(parent.start)
+                        top.linkTo(topGuideline)
+                    })
+                //VerticalSpacer(space = 15)
+                AddressField(Modifier.constrainAs(urlBox) {
+                    end.linkTo(parent.end)
+                    start.linkTo(parent.start)
+                    top.linkTo(title.bottom, topMargin)
+                    width = Dimension.percent(0.88f)
+                })
+                //VerticalSpacer(space = 18)
+                checkState = useAuth(Modifier.constrainAs(useAuth) {
+                    bottom.linkTo(usernameBox.top)
+                    start.linkTo(startGuide)
+                    top.linkTo(urlBox.bottom, topMargin)
+                })
+                //VerticalSpacer(space = 16)
+                OutlinedTextField(
+                    value = run {
+                        if (!checkBoxEnabled(checkState)) userName = ""
+                        userName
+                    },
+                    onValueChange = { userName = it },
+                    label = { Text(text = stringResource(id = R.string.username)) },
+                    shape = textFieldShape,
+                    enabled = checkBoxEnabled(checkState),
+                    modifier = Modifier.constrainAs(usernameBox) {
+                        end.linkTo(parent.end)
+                        start.linkTo(parent.start)
+                        top.linkTo(useAuth.bottom,4.dp)
+                        width = Dimension.percent(0.85f)
                     }
-                }
-            )
-            VerticalSpacer(space = 15)
-            val dialogViewModel = viewModel<DialogViewModel>()
-            val downloadInfoViewModel = viewModel<DownloadInfoViewModel>()
-            OutlinedButton(
-                onClick = {
-                    //check for invalid url
-                    //Jusg
-                    if (dialogViewModel.initialText.value?.text.isNullOrBlank()) {
-                        //set error
-                        dialogViewModel.setIsError(true)
-                        return@OutlinedButton
-                    }
-                    downloadInfoViewModel.setShowDialog(
-                        true,
-                        DownloadInfoViewModel.DownloadInfo.new(
-                            dialogViewModel.initialText.value?.text!!,
-                            checkState!!.value, userName, password
-                        )
-                    )
-                    setShowDialog(false)
-                },
-                shape = textFieldShape,
-                modifier = Modifier
-                    .align(Alignment.End)
-                    .padding(OkButtonPadding.dp),
-                border = textFieldBorder(width = OutlineWidth.dp),
-                elevation = ButtonDefaults.elevation(
-                    defaultElevation = 4.dp,
-                    pressedElevation = 1.dp
                 )
-            ) {
-                Text(text = stringResource(id = android.R.string.ok))
+                //VerticalSpacer(space = 16)
+                var showPassword by remember { mutableStateOf(false) }
+                OutlinedTextField(
+                    value = run {
+                        if (!checkBoxEnabled(checkState)) password = ""
+                        password
+                    },
+                    onValueChange = { password = it },
+                    label = { Text(text = stringResource(id = R.string.password)) },
+                    shape = textFieldShape,
+                    enabled = checkBoxEnabled(checkState),
+                    visualTransformation = if (showPassword) VisualTransformation.None else PasswordVisualTransformation(),
+                    trailingIcon = {
+                        //TODO animate between the 2 icons
+                        IconButton(onClick = { showPassword = !showPassword }) {
+                            Icon(
+                                imageVector = if (showPassword) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
+                                contentDescription = stringResource(id = R.string.toggle_password)
+                            )
+                        }
+                    },
+                    modifier = Modifier.constrainAs(passwordBox) {
+                        width = Dimension.percent(0.85f)
+                        end.linkTo(parent.end)
+                        start.linkTo(parent.start)
+                        top.linkTo(usernameBox.bottom, topMargin)
+                        bottom.linkTo(okButton.top)
+                    },
+                )
+                //VerticalSpacer(space = 15)
+                val dialogViewModel = viewModel<DialogViewModel>()
+                val downloadInfoViewModel = viewModel<DownloadInfoViewModel>()
+                OutlinedButton(
+                    onClick = {
+                        //check for invalid url
+                        //Jusg
+                        if (dialogViewModel.initialText.value?.text.isNullOrBlank()) {
+                            //set error
+                            dialogViewModel.setIsError(true)
+                            return@OutlinedButton
+                        }
+                        downloadInfoViewModel.setShowDialog(
+                            true,
+                            DownloadInfoViewModel.DownloadInfo.new(
+                                dialogViewModel.initialText.value?.text!!,
+                                checkState!!.value, userName, password
+                            )
+                        )
+                        setShowDialog(false)
+                    },
+                    shape = textFieldShape,
+                    modifier = Modifier.constrainAs(okButton) {
+                        bottom.linkTo(parent.bottom)
+                        end.linkTo(parent.end)
+                        top.linkTo(passwordBox.bottom)
+                    }.padding(14.dp),
+                    border = textFieldBorder(width = OutlineWidth.dp),
+                    elevation = ButtonDefaults.elevation(
+                        defaultElevation = 4.dp,
+                        pressedElevation = 1.dp
+                    )
+                ) {
+                    Text(text = stringResource(id = android.R.string.ok))
+                }
             }
         }
     }
@@ -159,7 +193,7 @@ private fun useAuth(modifier: Modifier): MutableState<Boolean> {
     val interaction = remember { MutableInteractionSource() }
     Row(modifier.clickable(interaction, indication = null) {
         onCheckChange(!checkState.value)
-    }) {
+    },verticalAlignment = Alignment.CenterVertically) {
         Checkbox(
             checked = checkState.value,
             onCheckedChange = onCheckChange,
@@ -172,7 +206,7 @@ private fun useAuth(modifier: Modifier): MutableState<Boolean> {
 }
 
 @Composable
-private fun AddressField() {
+private fun AddressField(modifier: Modifier) {
     //Get url from clipboard
     val dialogViewModel = viewModel<DialogViewModel>()
     val initialValueState by dialogViewModel.initialText.observeAsState()
@@ -200,7 +234,7 @@ private fun AddressField() {
         },
         shape = textFieldShape,
         singleLine = true,
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier,
         isError = isError,
         trailingIcon =
         if (isError) {
@@ -243,3 +277,5 @@ private fun geCopiedText(): String? {
 
 fun setAddUrlTextField() =
     TextFieldValue(geCopiedText()?.let { if (it.isUrl) it else null } ?: "")
+
+private val topMargin = 12.dp
