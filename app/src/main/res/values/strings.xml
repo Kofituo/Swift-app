@@ -1,0 +1,28 @@
+<resources>
+    <string name="app_name">Swift_final</string>
+    <string name="menu">Menu</string>
+    <string name="add_url">Add URL</string>
+    <string name="downloaded">Finished</string>
+    <string name="unfinished">Unfinished</string>
+    <string name="options">Options</string>
+    <string name="share">Share</string>
+    <string name="help">Help</string>
+    <string name="add_url_title">Enter New Address To Download</string>
+    <string name="address">Address</string>
+    <string name="use_authorisation">Use Authorisation</string>
+    <string name="username">Username</string>
+    <string name="toggle_password">Toggle View Password</string>
+    <string name="password">Password</string>
+    <string name="invalid_url">Invalid Url</string>
+    <string name="invalid_url_toast">Please Enter A Valid Url</string>
+    <string name="download_information">Download Information</string>
+    <string name="url">Url</string>
+    <string name="file_name">Filename</string>
+    <string name="file_size">File Size</string>
+    <string name="category">Category</string>
+    <string name="resumable">Resumable</string>
+    <string name="no">No</string>
+    <string name="yes">Yes</string>
+    <string name="download">Download</string>
+    <string name="categories">Categories</string>
+</resources>
