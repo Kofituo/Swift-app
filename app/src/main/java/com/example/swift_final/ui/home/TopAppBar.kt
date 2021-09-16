@@ -91,7 +91,7 @@ fun TopAppBar(
             Row(
                 Modifier.fillMaxHeight(),
                 horizontalArrangement = Arrangement.Start,
-                verticalAlignment = Alignment.Top,
+                verticalAlignment = Alignment.CenterVertically,
                 content = actions
             )
         }

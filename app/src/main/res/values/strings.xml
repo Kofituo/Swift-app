@@ -25,4 +25,8 @@
     <string name="yes">Yes</string>
     <string name="download">Download</string>
     <string name="categories">Categories</string>
+    <string name="all_downloads">All downloads</string>
+    <string name="find">Find</string>
+    <string name="tell_friend">Tell A Friend</string>
+    <string name="search">Search</string>
 </resources>

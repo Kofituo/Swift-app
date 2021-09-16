@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
@@ -21,7 +22,7 @@ fun FrontPage() {
     val scope = rememberCoroutineScope()
     Scaffold(
         scaffoldState = scaffoldState,
-        drawerContent = { Text("Drawer content") },
+        drawerContent = { Drawer.DrawerContent() },
         drawerShape = Drawer.drawerShape(),
         topBar = {
             TopAppBar(
@@ -45,11 +46,20 @@ fun FrontPage() {
                             Modifier.size(28.dp)
                         )
                     }
+                },
+                actions = {
+                    IconButton(onClick = { /*TODO*/ }) {
+                        Icon(
+                            imageVector = Icons.Filled.Search,
+                            contentDescription = stringResource(id = R.string.search),
+                            Modifier.size(28.dp)
+                        )
+                    }
                 }
             )
         },
         content = { innerPadding ->
-           FrontPageContent(innerPadding)
+            FrontPageContent(innerPadding)
         },
         //backgroundColor = Color.Gray
     )

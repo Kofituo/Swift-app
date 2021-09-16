@@ -17,3 +17,5 @@ inline val textFieldShape get() = RoundedCornerShape(TextFieldRadius.dp)
 @OptIn(ExperimentalComposeUiApi::class)
 inline val dialogProperties get() = DialogProperties(usePlatformDefaultWidth = false)
 const val DialogWidth = 90f
+const val DrawerRadius = 30f
+const val DrawerButtonPadding = 13

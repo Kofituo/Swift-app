@@ -1,6 +1,5 @@
 package com.example.swift_final.ui.home
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -21,12 +20,12 @@ class DownloadInfoViewModel : ViewModel() {
                 url: String,
                 useAuth: Boolean,
                 username: String = "",
-                password: String = ""
+                password: String? = null
             ) =
                 if (useAuth) DownloadInfo(url, Authorisation(username, password))
                 else DownloadInfo(url)
         }
     }
 
-    data class Authorisation(val username: String, val password: String)
+    data class Authorisation(val username: String, val password: String?)
 }

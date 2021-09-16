@@ -1,7 +1,6 @@
 package com.example.swift_final.ui.home
 
 import android.util.Log
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -80,7 +79,7 @@ fun FrontPageContent(paddingValues: PaddingValues) {
         VerticalSpacer(space = 15)
         Row(horizontalArrangement = Arrangement.Center, modifier = Modifier.padding(10.dp)) {
             ExtraButtons(
-                imageId = R.drawable.ic_folder,
+                imageId = R.drawable.ic_folders,
                 text = R.string.downloaded,
                 modifier = Modifier.weight(1f)
             ) {
@@ -88,7 +87,7 @@ fun FrontPageContent(paddingValues: PaddingValues) {
             }
             HorizontalSpacer(space = 15)
             ExtraButtons(
-                imageId = R.drawable.ic_un_download,
+                imageId = R.drawable.ic_download_bordered,
                 text = R.string.unfinished,
                 modifier = Modifier.weight(1f)
             ) {

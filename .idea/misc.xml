@@ -3,6 +3,12 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/taimoor/Desktop/Swift_final/app/src/main/res/drawable-night/ic_download_bordered.xml" value="0.22870370370370371" />
+        <entry key="..\:/Users/taimoor/Desktop/Swift_final/app/src/main/res/drawable/ic_download_bdark.xml" value="0.22870370370370371" />
+        <entry key="..\:/Users/taimoor/Desktop/Swift_final/app/src/main/res/drawable/ic_download_bordered.xml" value="0.29583333333333334" />
+        <entry key="..\:/Users/taimoor/Desktop/Swift_final/app/src/main/res/drawable/ic_folder.xml" value="0.22870370370370371" />
+        <entry key="..\:/Users/taimoor/Desktop/Swift_final/app/src/main/res/drawable/ic_folders.xml" value="0.22870370370370371" />
+        <entry key="..\:/Users/taimoor/Desktop/Swift_final/app/src/main/res/drawable/ic_folders_dark.xml" value="0.29583333333333334" />
         <entry key="..\:/Users/taimoor/Desktop/Swift_final/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.16458333333333333" />
       </map>
     </option>

@@ -54,7 +54,7 @@ fun OnAddUrlClicked(showDialog: Boolean, setShowDialog: (Boolean) -> Unit) {
     if (!showDialog) return
     var checkState: MutableState<Boolean>?
     var userName by rememberSaveable { mutableStateOf("") }
-    var password by rememberSaveable { mutableStateOf("") }
+    var password: String? by rememberSaveable { mutableStateOf(null) }
     Dialog(onDismissRequest = {
         setShowDialog(false)
         //Log.e("dismmissed", "hyoyu $checkState")
@@ -106,7 +106,7 @@ fun OnAddUrlClicked(showDialog: Boolean, setShowDialog: (Boolean) -> Unit) {
                     modifier = Modifier.constrainAs(usernameBox) {
                         end.linkTo(parent.end)
                         start.linkTo(parent.start)
-                        top.linkTo(useAuth.bottom,4.dp)
+                        top.linkTo(useAuth.bottom, 4.dp)
                         width = Dimension.percent(0.85f)
                     }
                 )
@@ -114,8 +114,8 @@ fun OnAddUrlClicked(showDialog: Boolean, setShowDialog: (Boolean) -> Unit) {
                 var showPassword by remember { mutableStateOf(false) }
                 OutlinedTextField(
                     value = run {
-                        if (!checkBoxEnabled(checkState)) password = ""
-                        password
+                        if (!checkBoxEnabled(checkState)) password = null //reset password
+                        password ?: ""
                     },
                     onValueChange = { password = it },
                     label = { Text(text = stringResource(id = R.string.password)) },
@@ -161,11 +161,13 @@ fun OnAddUrlClicked(showDialog: Boolean, setShowDialog: (Boolean) -> Unit) {
                         setShowDialog(false)
                     },
                     shape = textFieldShape,
-                    modifier = Modifier.constrainAs(okButton) {
-                        bottom.linkTo(parent.bottom)
-                        end.linkTo(parent.end)
-                        top.linkTo(passwordBox.bottom)
-                    }.padding(14.dp),
+                    modifier = Modifier
+                        .constrainAs(okButton) {
+                            bottom.linkTo(parent.bottom)
+                            end.linkTo(parent.end)
+                            top.linkTo(passwordBox.bottom)
+                        }
+                        .padding(14.dp),
                     border = textFieldBorder(width = OutlineWidth.dp),
                     elevation = ButtonDefaults.elevation(
                         defaultElevation = 4.dp,
@@ -193,7 +195,7 @@ private fun useAuth(modifier: Modifier): MutableState<Boolean> {
     val interaction = remember { MutableInteractionSource() }
     Row(modifier.clickable(interaction, indication = null) {
         onCheckChange(!checkState.value)
-    },verticalAlignment = Alignment.CenterVertically) {
+    }, verticalAlignment = Alignment.CenterVertically) {
         Checkbox(
             checked = checkState.value,
             onCheckedChange = onCheckChange,

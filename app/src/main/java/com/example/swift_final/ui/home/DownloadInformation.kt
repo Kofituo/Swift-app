@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.constraintlayout.compose.ConstraintSet
 import androidx.constraintlayout.compose.Dimension
 import com.example.swift_final.R
 import com.example.swift_final.ui.*
@@ -183,6 +184,39 @@ fun DownloadInfoDialog(
             }
         }
     }
+}
+
+//TODO
+private fun constraints(isLandscape: Boolean) = ConstraintSet {
+    val title = createRefFor(ConstraintIds.Title)
+    val divider = createRefFor(ConstraintIds.Divider)
+    val shimmer = createRefFor(ConstraintIds.ShimmerLayout)
+    val downloadButton = createRefFor(ConstraintIds.DownloadButton)
+    //Guidelines
+    val iconGuideline = if (isLandscape) createGuidelineFromEnd(0.2f) else null
+    val topGuide = createGuidelineFromTop(0.04f)
+    val startGuide = createGuidelineFromStart(0.045f)
+    val endGuide = createGuidelineFromEnd(0.045f)
+
+    constrain(title) {
+        bottom.linkTo(divider.top)
+        end.linkTo(parent.end)
+        start.linkTo(parent.start)
+        top.linkTo(topGuide)
+    }
+
+    constrain(divider) {
+        end.linkTo(endGuide)
+        start.linkTo(startGuide)
+        top.linkTo(title.bottom, topMargin)
+    }
+}
+
+private object ConstraintIds {
+    const val Title = "title"
+    const val Divider = "divider"
+    const val ShimmerLayout = "shimmer"
+    const val DownloadButton = "download"
 }
 
 @Composable
