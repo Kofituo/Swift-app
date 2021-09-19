@@ -1,13 +1,27 @@
-struct Authorisation {
+use rust_interface_file_generator::gen_attributes_interface_generator::*;
+#[generate_interface_doc]
+#[derive(Clone)]
+pub struct Authorisation {
     username: String,
-    password:Option<String>
+    password: Option<String>,
 }
 
-struct DownloadInfo {
+impl Authorisation {
+    #[generate_interface(constructor)]
+    pub fn new() -> Authorisation {
+        panic!()
+    }
+}
+
+pub struct DownloadInfo {
     url: String,
-    auth:Option<Authorisation>,
+    auth: Option<Authorisation>,
 }
 
 impl DownloadInfo {
-    //fn new(url:String,)
+    #[generate_interface(constructor)]
+    pub fn new(url: String, auth: Option<Authorisation>) -> DownloadInfo {
+        panic!();
+        //DownloadInfo { url, auth }
+    }
 }

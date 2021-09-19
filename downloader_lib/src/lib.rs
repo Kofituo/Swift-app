@@ -1,5 +1,8 @@
 mod download_info;
 mod java_glue;
+//mod java_glue
+
+use crate::download_info::*;
 pub use crate::java_glue::*;
 use rust_interface_file_generator::gen_attributes_interface_generator::*;
 

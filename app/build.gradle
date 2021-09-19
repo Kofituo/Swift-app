@@ -45,6 +45,11 @@ android {
             excludes += '/META-INF/{AL2.0,LGPL2.1}'
         }
     }
+    sourceSets {
+        main {
+            jniLibs.srcDirs = ['src/main/libs']
+        }
+    }
     compileSdkVersion 31
     buildToolsVersion '31.0.0'
     ndkVersion '23.0.7599858'

@@ -12,5 +12,6 @@ class ApplicationLoader:Application() {
     override fun onCreate() {
         _applicationContext = applicationContext
         super.onCreate()
+        System.loadLibrary("downloader_lib")
     }
 }
