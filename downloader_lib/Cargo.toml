@@ -1,0 +1,19 @@
+[package]
+name = "downloader_lib"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[lib]
+name = "downloader_lib"
+crate-type = ["cdylib"]
+
+
+[dependencies]
+rust_interface_file_generator = "*"
+jni-sys = "*"
+log = "*"
+
+[build-dependencies]
+rust_interface_file_generator = "*"
+flapigen = { git = "https://github.com/Dushistov/flapigen-rs", rev = "fa3cd2c4d411f7e1eab7e0c17357a1d8a918c9b2" }

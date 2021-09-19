@@ -5,14 +5,8 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.tooling.preview.Preview
 import com.example.swift_final.ui.home.DialogViewModel
 import com.example.swift_final.ui.home.FrontPage
-import com.example.swift_final.ui.home.OnAddUrlClicked
 import com.example.swift_final.ui.home.setAddUrlTextField
 import com.example.swift_final.ui.theme.Swift_finalTheme
 
