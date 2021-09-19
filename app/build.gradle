@@ -45,6 +45,9 @@ android {
             excludes += '/META-INF/{AL2.0,LGPL2.1}'
         }
     }
+    compileSdkVersion 31
+    buildToolsVersion '31.0.0'
+    ndkVersion '23.0.7599858'
 }
 
 dependencies {
@@ -67,4 +70,64 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
     androidTestImplementation "androidx.compose.ui:ui-test-junit4:$compose_version"
     debugImplementation "androidx.compose.ui:ui-tooling:$compose_version"
+}
+
+// app/build.gradle
+def rustBasePath = "C:\\Users\\taimoor\\Desktop\\Swift_final\\downloader_lib"
+def archTriplets = [
+        'armeabi-v7a': 'armv7-linux-androideabi',
+        'arm64-v8a': 'aarch64-linux-android',
+]
+
+// TODO: only pass --release if buildType is release
+archTriplets.each { arch, target ->
+
+    // execute cargo metadata and get path to target directory
+/*tasks.create(name: "cargo-output-dir-${arch}", description: "Get cargo metadata") {
+        new ByteArrayOutputStream().withStream { os ->
+            exec {
+                commandLine 'cargo', 'metadata', '--format-version', '1'
+                workingDir rustBasePath
+                standardOutput = os
+            }
+            def outputAsString = os.toString()
+            def json = new ().parseText(outputAsString)
+
+            logger.error("cargo target directory: ${json.target_directory}")
+            project.ext.cargo_target_directory = json.target_directory
+        }
+    }*/
+
+    project.ext.cargo_target_directory = "C:\\Users\\taimoor\\Desktop\\Swift_final\\downloader_lib\\target"
+    // Build with cargo
+    tasks.create(name: "cargo-build-${arch}", type: Exec, description: "Building core for ${arch}") {
+        workingDir rustBasePath
+        commandLine 'cargo', 'build', "--target=${target}", '--release'
+    }
+    // Sync shared native dependencies
+    tasks.create(name: "sync-rust-deps-${arch}", type: Sync, dependsOn: "cargo-build-${arch}") {
+        from "${rustBasePath}/src/libs/${arch}"
+        include "*.so"
+        into "src/main/libs/${arch}"
+    }
+    // Copy build libs into this app's libs directory
+    tasks.create(name: "rust-deploy-${arch}", type: Copy, dependsOn: "sync-rust-deps-${arch}", description: "Copy rust libs for (${arch}) to jniLibs") {
+        from "${project.ext.cargo_target_directory}/${target}/release"
+        include "*.so"
+        into "src/main/libs/${arch}"
+    }
+
+    // Hook up tasks to execute before building java
+    tasks.withType(JavaCompile) {
+        compileTask -> compileTask.dependsOn "rust-deploy-${arch}"
+    }
+    preBuild.dependsOn "rust-deploy-${arch}"
+
+    // Hook up clean tasks
+    tasks.create(name: "clean-${arch}", type: Delete, description: "Deleting built libs for ${arch}", dependsOn: "cargo-output-dir-${arch}") {
+        delete fileTree("${project.ext.cargo_target_directory}/${target}/release") {
+            include '*.so'
+        }
+    }
+    clean.dependsOn "clean-${arch}"
 }
