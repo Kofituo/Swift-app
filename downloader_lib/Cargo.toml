@@ -13,6 +13,11 @@ crate-type = ["cdylib"]
 rust_interface_file_generator = "*"
 jni-sys = "*"
 log = "*"
+log-panics="*"
+android_logger = "*"
+serde_json = "*"
+serde = { version = "*", features = ["derive"] }
+derive-new = "*"
 
 [build-dependencies]
 rust_interface_file_generator = "*"

@@ -3,6 +3,8 @@ package com.example.swift_final.ui.home
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.example.swift_final.lib.Authentication
+import com.example.swift_final.lib.DownloadInfo
 
 class DownloadInfoViewModel : ViewModel() {
     private val _dialogShowing = MutableLiveData(false)
@@ -14,7 +16,18 @@ class DownloadInfoViewModel : ViewModel() {
         _dialogShowing.value = shouldShow
     }
 
-    data class DownloadInfo(val url: String, val authorisation: Authorisation? = null) {
+    companion object {
+        fun newDownloadInfo(
+            url: String,
+            useAuth: Boolean,
+            username: String = "",
+            password: String? = null
+        ) =
+            if (useAuth) DownloadInfo(url, Authentication(username, password))
+            else DownloadInfo(url, null)
+    }
+
+    /*data class DownloadInfo(val url: String, val authorisation: Authorisation? = null) {
         companion object {
             fun new(
                 url: String,
@@ -27,5 +40,5 @@ class DownloadInfoViewModel : ViewModel() {
         }
     }
 
-    data class Authorisation(val username: String, val password: String?)
+    data class Authorisation(val username: String, val password: String?)*/
 }

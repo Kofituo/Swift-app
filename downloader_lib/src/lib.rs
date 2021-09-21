@@ -1,10 +1,10 @@
+mod download_callback;
 mod download_info;
 mod java_glue;
-//mod java_glue
+mod logger;
 
 use crate::download_info::*;
 pub use crate::java_glue::*;
-use rust_interface_file_generator::gen_attributes_interface_generator::*;
 
 //constants
 // 1 MB
@@ -15,6 +15,11 @@ static mut NUMBER_OF_THREADS: u8 = 8;
 
 const DO_NOT_TOUCH: &[u8] =
     b"/** WARNING **/\n/** MACHINE GENERATED FILE **/\n/** DO NOT EDIT **/\n";
+
+///Struct to download data
+struct Downloader {
+    download_info: DownloadInfo,
+}
 
 #[cfg(test)]
 mod tests {

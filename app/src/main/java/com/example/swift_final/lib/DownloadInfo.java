@@ -5,7 +5,7 @@ import androidx.annotation.Nullable;
 
 public final class DownloadInfo {
 
-    public DownloadInfo(@NonNull String url, @Nullable Authorisation auth) {
+    public DownloadInfo(@NonNull String url, @Nullable Authentication auth) {
         long a1 = 0;//TODO: use ptr::null() for corresponding constant
         if (auth != null) {
             a1 = auth.mNativeObj;
@@ -16,6 +16,13 @@ public final class DownloadInfo {
         JNIReachabilityFence.reachabilityFence1(auth);
     }
     private static native long init(@NonNull String url, long auth);
+
+    public final @NonNull String getUrl() {
+        String ret = do_getUrl(mNativeObj);
+
+        return ret;
+    }
+    private static native @NonNull String do_getUrl(long self);
 
     public synchronized void delete() {
         if (mNativeObj != 0) {

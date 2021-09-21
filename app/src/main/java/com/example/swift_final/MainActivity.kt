@@ -5,7 +5,7 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import com.example.swift_final.lib.Start
+import com.example.swift_final.lib.DownloadInfo
 import com.example.swift_final.ui.home.DialogViewModel
 import com.example.swift_final.ui.home.FrontPage
 import com.example.swift_final.ui.home.setAddUrlTextField
@@ -19,6 +19,7 @@ class MainActivity : ComponentActivity() {
                 FrontPage()
             }
         }
+        DownloadInfo("here",null)
     }
 
     private val dialogViewModel by viewModels<DialogViewModel>()

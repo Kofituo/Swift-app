@@ -2,7 +2,6 @@ package com.example.swift_final.ui.home
 
 import android.content.ClipDescription
 import android.util.Log
-import android.view.Gravity
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -19,29 +18,17 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.geometry.toRect
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Outline
-import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.unit.Density
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import androidx.compose.ui.window.DialogProperties
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import androidx.core.content.getSystemService
-import androidx.core.view.GravityCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.swift_final.ApplicationLoader
 import com.example.swift_final.R
@@ -153,7 +140,7 @@ fun OnAddUrlClicked(showDialog: Boolean, setShowDialog: (Boolean) -> Unit) {
                         }
                         downloadInfoViewModel.setShowDialog(
                             true,
-                            DownloadInfoViewModel.DownloadInfo.new(
+                            DownloadInfoViewModel.newDownloadInfo(
                                 dialogViewModel.initialText.value?.text!!,
                                 checkState!!.value, userName, password
                             )

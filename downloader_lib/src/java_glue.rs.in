@@ -2,14 +2,21 @@
 use crate::*;
 use jni_sys::*;
 foreign_class!(
-	class Authorisation {
-		self_type Authorisation;
-		constructor Authorisation::new()->Authorisation;
+	class Logger {
+		# [doc = "Set up logging"]
+		fn Logger::initialise_logging(); alias initialiseLogging;
+	}
+);
+foreign_class!(
+	class Authentication {
+		self_type Authentication;
+		constructor Authentication::new(username : String , password : Option < & str >)->Authentication;
 	}
 );
 foreign_class!(
 	class DownloadInfo {
 		self_type DownloadInfo;
-		constructor DownloadInfo::new(url : String , auth : Option < Authorisation >)->DownloadInfo;
+		constructor DownloadInfo::constructor(url : String , auth : Option < Authentication >)->DownloadInfo;
+		fn DownloadInfo::get_url(& self)->&str; alias getUrl;
 	}
 );
