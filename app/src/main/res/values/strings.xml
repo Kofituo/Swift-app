@@ -25,8 +25,20 @@
     <string name="yes">Yes</string>
     <string name="download">Download</string>
     <string name="categories">Categories</string>
+    <string name="error">Error!</string>
     <string name="all_downloads">All downloads</string>
     <string name="find">Find</string>
     <string name="tell_friend">Tell A Friend</string>
     <string name="search">Search</string>
+    <string name="error_icon">Error Icon</string>
+    <string name="no_internet_connection">No internet connection available</string>
+    <string name="error_parsing_req">Error occurred while parsing request</string>
+    <string name="status_code">Status code:</string>
+    <string name="reason">Reason:</string>
+    <string name="unknown_error">Unknown error!</string>
+    <string name="redirected_many">Redirect limit reached</string>
+    <string name="timeout">Connection timeout :\</string>
+    <string name="retry">Retry</string>
+    <string name="cancel">Cancel</string>
+    <string name="unknown_size">Unknown Size</string>
 </resources>

@@ -1,7 +1,9 @@
 package com.example.swift_final.ui.home
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.*
@@ -14,27 +16,35 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.ConstraintSet
 import androidx.constraintlayout.compose.Dimension
+import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.swift_final.ApplicationLoader
 import com.example.swift_final.R
-import com.example.swift_final.lib.DownloadCallback
-import com.example.swift_final.lib.DownloadInfo
-import com.example.swift_final.lib.FileCategory
-import com.example.swift_final.lib.ResponseErrors
+import com.example.swift_final.lib.*
 import com.example.swift_final.ui.*
 import com.example.swift_final.util.DisplayUtils
 import com.example.swift_final.util.DisplayUtils.ScreenPixels.Companion.widthInDp
 import com.example.swift_final.util.textFieldBorder
 import com.example.swift_final.ui.shimmer.shimmer
+import com.example.swift_final.util.HorizontalSpacer
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import kotlin.time.ExperimentalTime
+import kotlin.time.measureTimedValue
 
-
-@OptIn(ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalComposeUiApi::class, ExperimentalTime::class)
 @Composable
 fun DownloadInfoDialog(
     downloadInfo: DownloadInfo?,
@@ -48,7 +58,8 @@ fun DownloadInfoDialog(
     val filesize = rememberSaveable { mutableStateOf("") }
     val category = rememberSaveable { mutableStateOf("") }
     val resumable = rememberSaveable { mutableStateOf("") }
-    val showShimmer by rememberSaveable { mutableStateOf(true) }
+    var showShimmer by rememberSaveable { mutableStateOf(true) }
+    var enable by rememberSaveable { mutableStateOf(false) }
 
     Dialog(
         onDismissRequest = { setShowDialog(null) },
@@ -124,7 +135,8 @@ fun DownloadInfoDialog(
                                 start.linkTo(parent.start)
                                 top.linkTo(urlBox.bottom, topMargin)
                                 width = Dimension.fillToConstraints
-                            }
+                            },
+                        enabled = enable
                     )
                     DownloadInfoTextField(
                         valueHolder = filesize,
@@ -146,7 +158,8 @@ fun DownloadInfoDialog(
                             start.linkTo(parent.start)
                             top.linkTo(filesizeBox.bottom, topMargin)
                             width = Dimension.fillToConstraints
-                        })
+                        }, enabled = enable
+                    )
                     DownloadInfoTextField(
                         valueHolder = resumable,
                         label = R.string.resumable,
@@ -181,21 +194,141 @@ fun DownloadInfoDialog(
         }
     }
 
-    // load data
+    var sendRequest by rememberSaveable { mutableStateOf(true) }
+    var errorDialogData: ErrorDialogData? by remember { mutableStateOf(null) }
+    var showErrorDialog by remember { mutableStateOf(false) }
 
-    object : DownloadCallback {
-        override fun responseError(error: ResponseErrors) {
+    if (sendRequest) {
+        Log.e("main ? thread", "${Thread.currentThread()}")
+        val callback = object : DownloadCallback {
+            var shouldDismiss = true
+            override fun responseError(error: ResponseErrors) {
+                val resId = when (error) {
+                    ResponseErrors.ConnectionTimeout -> R.string.timeout
+                    ResponseErrors.ErrorParsingRequest, ResponseErrors.UnableToDecodeRequest -> R.string.error_parsing_req
+                    ResponseErrors.RedirectedManyTimes -> R.string.redirected_many
+                    ResponseErrors.UnknownError -> R.string.unknown_error
+                }
+                errorDialogData = ErrorDialogData(
+                    body = ApplicationLoader.getString(resId),
+                    onDialogDismiss = {
+                        showErrorDialog = false
+                        if (shouldDismiss)
+                            setShowDialog(null)
+                    },
+                    confirmButtonText = ApplicationLoader.getString(R.string.retry),
+                    confirmButtonCallback = {
+                        showErrorDialog = false
+                        sendRequest = true
+                        shouldDismiss = false
+                    },
+                    dismissButtonText = ApplicationLoader.getString(R.string.cancel),
+                    dismissButtonCallback = {
+                        showErrorDialog = false
+                        setShowDialog(null)
+                    })
+            }
+
+            override fun statusError(error_code: Int, reason: String) {
+                ErrorDialogData(
+                    title = "${ApplicationLoader.getString(R.string.status_code)} $error_code",
+                    body = "${ApplicationLoader.getString(R.string.reason)} $reason",
+                    onDialogDismiss = {
+                        showErrorDialog = false
+                    },
+                    confirmButtonText = ApplicationLoader.getString(R.string.cancel),
+                    confirmButtonCallback = {
+                        showErrorDialog = false
+                    }
+                )
+            }
         }
-
-        override fun statusError(error_code: Int, reason: String) {
-
+        LaunchedEffect(true) {
+            withContext(Dispatchers.IO) {
+                Log.e("thread", "${Thread.currentThread()}")
+                val info = Downloader.getRequestInfo(downloadInfo, callback)
+                sendRequest = false
+                if (info == null) {
+                    showErrorDialog = true
+                } else {
+                    //success
+                    filename.value = info.filename()
+                    filesize.value =
+                        info.fileSize ?: ApplicationLoader.getString(id = R.string.unknown_size)
+                    category.value = info.category.name
+                    resumable.value =
+                        ApplicationLoader.getString(id = if (info.isResumable) R.string.yes else R.string.no)
+                    showShimmer = false
+                    enable = true
+                }
+            }
+        }
+    }
+    if (showErrorDialog) {
+        errorDialogData!!.let {
+            ErrorDialog(
+                title = it.title,
+                body = it.body,
+                onDialogDismiss = it.onDialogDismiss,
+                confirmButtonText = it.confirmButtonText,
+                confirmButtonCallback = it.confirmButtonCallback,
+                dismissButtonText = it.dismissButtonText,
+                dismissButtonCallback = it.dismissButtonCallback
+            )
         }
     }
 }
 
-@Composable
-private fun ProcessRequest() {
+data class ErrorDialogData(
+    var title: String = ApplicationLoader.getString(id = R.string.error),
+    var body: String,
+    var onDialogDismiss: () -> Unit,
+    var confirmButtonText: String,
+    var confirmButtonCallback: () -> Unit,
+    var dismissButtonText: String? = null,
+    var dismissButtonCallback: (() -> Unit)? = null,
+)
 
+@Composable
+private fun ErrorDialog(
+    title: String = stringResource(id = R.string.error),
+    body: String,
+    onDialogDismiss: () -> Unit,
+    confirmButtonText: String,
+    confirmButtonCallback: () -> Unit,
+    dismissButtonText: String? = null,
+    dismissButtonCallback: (() -> Unit)? = null,
+) {
+    AlertDialog(
+        onDismissRequest = onDialogDismiss,
+        title = {
+            Row {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_baseline_error_outline_24),
+                    contentDescription = stringResource(id = R.string.error_icon),
+                    tint = Color.Unspecified
+                )
+                HorizontalSpacer(space = 10)
+                Text(text = title)
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = confirmButtonCallback) {
+                Text(text = confirmButtonText)
+            }
+        },
+        dismissButton = dismissButtonText?.let {
+            {
+                requireNotNull(dismissButtonCallback)
+                TextButton(onClick = dismissButtonCallback) {
+                    Text(text = it)
+                }
+            }
+        },
+        text = {
+            Text(text = body)
+        }
+    )
 }
 
 //TODO
@@ -239,7 +372,7 @@ private fun DownloadInfoTextField(
     enabled: Boolean = true,
     readOnly: Boolean = false,
     trailingIcon: @Composable (() -> Unit)? = null,
-    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() }
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
 ) {
     OutlinedTextField(
         value = valueHolder.value,
@@ -257,7 +390,7 @@ private fun DownloadInfoTextField(
 
 @Composable
 //TODO: Support more locales if app blows
-private fun Category(valueHolder: MutableState<String>, modifier: Modifier) {
+private fun Category(valueHolder: MutableState<String>, modifier: Modifier, enabled: Boolean) {
     var isExpanded by remember { mutableStateOf(false) }
 
     Column(modifier = modifier) {
@@ -295,7 +428,8 @@ private fun Category(valueHolder: MutableState<String>, modifier: Modifier) {
                     )
                 }
             },
-            interactionSource = interactionSource
+            interactionSource = interactionSource,
+            enabled = enabled
         )
     }
 }

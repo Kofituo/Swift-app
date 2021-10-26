@@ -12,15 +12,13 @@ pub use crate::java_glue::*;
 use crate::logger::*;
 use percent_encoding::percent_decode_str;
 use reqwest::blocking::Response;
-use reqwest::header::{CONTENT_DISPOSITION, CONTENT_TYPE};
+use reqwest::header::{ACCEPT_RANGES, CONTENT_DISPOSITION, CONTENT_TYPE};
 
 use crate::download_callback::DownloadCallback;
 use crate::errors::ResponseErrors;
 use crate::filetypes::TypeOfFile;
 use mime::Mime;
 use rifgen::rifgen_attr::*;
-use std::error::Error;
-use std::ops::Deref;
 use std::path::PathBuf;
 use std::str::FromStr;
 
@@ -43,7 +41,7 @@ struct Downloader {
 impl Downloader {
     #[generate_interface]
     fn get_request_info(
-        download_info: DownloadInfo,
+        download_info: &DownloadInfo,
         download_callback: &Box<dyn DownloadCallback>,
     ) -> Option<RequestInfo> {
         let mut error = None;
@@ -52,14 +50,17 @@ impl Downloader {
             if let Some(val) = &download_info.auth {
                 builder = builder.basic_auth(&val.username, val.password.as_ref());
             }
+
             match builder.send() {
                 Ok(val) => {
                     //success
+                    let (type_of_file, filename) = Downloader::filename_and_type(&val);
                     return RequestInfo::new(
-                        download_info,
-                        Downloader::filename(&val),
+                        download_info.clone(),
+                        filename,
                         val.content_length().map(|i| i as i64),
-                        Downloader::get_mime_type(&val),
+                        type_of_file,
+                        val.headers().contains_key(ACCEPT_RANGES),
                     )
                     .into();
                 }
@@ -70,7 +71,7 @@ impl Downloader {
         None
     }
 
-    fn filename(response: &Response) -> String {
+    fn filename_and_type(response: &Response) -> (TypeOfFile, String) {
         let disposition = response.headers().get(CONTENT_DISPOSITION);
         let name_from_url = //first check the header then the title then the url
             disposition.map(|it| it.to_str())
@@ -101,38 +102,31 @@ impl Downloader {
                             .unwrap_or_else(|| String::from("tmp.bin"))
                     })
                 );
-        let mut name_path = path_buf!(&name_from_url);
-        if name_path.extension().is_none() {
-            let ext = match response.headers().get(CONTENT_TYPE) {
-                None => String::new(),
-                Some(content_type) => {
-                    let content_type = Mime::from_str(content_type.to_str().unwrap_or_default())
-                        .unwrap_or(mime::TEXT_PLAIN);
-                    match content_type.subtype() {
-                        mime::PLAIN => "txt".to_string(),
-                        it => it.to_string(),
+        let mut name_path: PathBuf = path_buf!(&name_from_url);
+        match name_path.extension() {
+            None => {
+                let ext = match response.headers().get(CONTENT_TYPE) {
+                    None => String::new(),
+                    Some(content_type) => {
+                        let content_type =
+                            Mime::from_str(content_type.to_str().unwrap_or_default())
+                                .unwrap_or(mime::TEXT_PLAIN);
+                        match content_type.subtype() {
+                            mime::PLAIN => "txt".to_string(),
+                            it => it.to_string(),
+                        }
                     }
-                }
-            };
-            name_path.set_extension(ext);
-            format!("{}", name_path.to_string_lossy())
-        } else {
-            name_from_url
-        }
-    }
-
-    fn get_mime_type(response: &Response) -> TypeOfFile {
-        match response.headers().get(CONTENT_TYPE) {
-            None => TypeOfFile::Other,
-            Some(content_type) => {
-                let mut res = TypeOfFile::default();
-                if let Ok(string) = content_type.to_str() {
-                    if let Ok(mime) = Mime::from_str(string) {
-                        res = match_mime_type!(mime.type_(), Application, Audio, Video, Image)
-                    }
-                }
-                res
+                };
+                name_path.set_extension(&ext);
+                (
+                    FileType::new(&ext).get_type(),
+                    format!("{}", name_path.to_string_lossy()),
+                )
             }
+            Some(ext) => (
+                FileType::new(ext.to_string_lossy().as_ref()).get_type(),
+                name_from_url,
+            ),
         }
     }
 

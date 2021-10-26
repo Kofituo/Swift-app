@@ -4,6 +4,7 @@ use crate::get_type_sc;
 use rifgen::rifgen_attr::*;
 
 #[generate_interface]
+#[derive(Copy, Clone)]
 pub enum TypeOfFile {
     Word,
     Excel,
@@ -41,9 +42,9 @@ pub struct FileType {
 
 impl FileType {
     #[generate_interface(constructor)]
-    pub fn new(string: &str) -> FileType {
+    pub fn new(extension: &str) -> FileType {
         FileType {
-            file_extension: string.into(),
+            file_extension: extension.into(),
         }
     }
 

@@ -22,7 +22,8 @@ reqwest = {version = "*", features = ["blocking"] }
 openssl = { version = "*", features = ["vendored"] }
 percent-encoding = "*"
 mime = '*'
-casey = "0.3.0"
+casey = "*"
+byte-unit = "*"
 
 [build-dependencies]
 rifgen = "*"

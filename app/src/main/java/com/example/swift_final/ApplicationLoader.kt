@@ -5,11 +5,13 @@ import android.content.Context
 import com.example.swift_final.lib.Logger
 
 //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
-class ApplicationLoader:Application() {
+class ApplicationLoader : Application() {
     companion object {
         private var mApplicationContext: Context? = null
         val applicationContext get() = requireNotNull(mApplicationContext)
+        fun getString(id: Int) = applicationContext.resources.getString(id)
     }
+
     override fun onCreate() {
         mApplicationContext = applicationContext
         System.loadLibrary("downloader_lib")

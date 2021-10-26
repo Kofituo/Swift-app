@@ -2,12 +2,14 @@
 use crate::*;
 use jni_sys::*;
 foreign_enum!(
-	enum ResponseErrors {
-		ErrorParsingRequest = ResponseErrors::ErrorParsingRequest,
-		UnableToDecodeRequest = ResponseErrors::UnableToDecodeRequest,
-		RedirectedManyTimes = ResponseErrors::RedirectedManyTimes,
-		ConnectionTimeout = ResponseErrors::ConnectionTimeout,
-		UnknownError = ResponseErrors::UnknownError,
+	enum FileCategory {
+		Video = FileCategory::Video,
+		Document = FileCategory::Document,
+		Image = FileCategory::Image,
+		Compressed = FileCategory::Compressed,
+		Audio = FileCategory::Audio,
+		Application = FileCategory::Application,
+		Other = FileCategory::Other,
 	}
 );
 foreign_enum!(
@@ -37,28 +39,26 @@ foreign_enum!(
 	}
 );
 foreign_enum!(
-	enum FileCategory {
-		Video = FileCategory::Video,
-		Document = FileCategory::Document,
-		Image = FileCategory::Image,
-		Compressed = FileCategory::Compressed,
-		Audio = FileCategory::Audio,
-		Application = FileCategory::Application,
-		Other = FileCategory::Other,
+	enum ResponseErrors {
+		ErrorParsingRequest = ResponseErrors::ErrorParsingRequest,
+		UnableToDecodeRequest = ResponseErrors::UnableToDecodeRequest,
+		RedirectedManyTimes = ResponseErrors::RedirectedManyTimes,
+		ConnectionTimeout = ResponseErrors::ConnectionTimeout,
+		UnknownError = ResponseErrors::UnknownError,
+	}
+);
+foreign_class!(
+	class FileType {
+		self_type FileType;
+		constructor FileType::new(extension : & str)->FileType;
+		fn FileType::get_type(& self)->TypeOfFile; alias getType;
+		fn FileType::get_category(type_of_file : TypeOfFile)->FileCategory; alias getCategory;
 	}
 );
 foreign_class!(
 	class Logger {
 		# [doc = "Set up logging"]
 		fn Logger::initialise_logging(); alias initialiseLogging;
-	}
-);
-foreign_class!(
-	class FileType {
-		self_type FileType;
-		constructor FileType::new(string : & str)->FileType;
-		fn FileType::get_type(& self)->TypeOfFile; alias getType;
-		fn FileType::get_category(type_of_file : TypeOfFile)->FileCategory; alias getCategory;
 	}
 );
 foreign_class!(
@@ -78,7 +78,13 @@ foreign_class!(
 	# [doc = " Struct to hold information received from the server"]
 	class RequestInfo {
 		self_type RequestInfo;
-		constructor RequestInfo::new(download_info : DownloadInfo , filename : String , file_size : Option < i64 > , category : TypeOfFile ,)->RequestInfo;
+		constructor RequestInfo::new(download_info : DownloadInfo , filename : String , file_size : Option < i64 > , category : TypeOfFile , resumable : bool ,)->RequestInfo;
+		fn RequestInfo::get_url(& self)->&str; alias getUrl;
+		fn RequestInfo::get_file_size(& self)->Option<String>; alias getFileSize;
+		fn RequestInfo::is_resumable(& self)->bool; alias isResumable;
+		fn RequestInfo::type_of_file(& self)->TypeOfFile; alias typeOfFile;
+		fn RequestInfo::get_category(& self)->FileCategory; alias getCategory;
+		fn RequestInfo::filename(& self)->&str; alias filename;
 	}
 );
 foreign_callback!(
@@ -90,6 +96,6 @@ foreign_callback!(
 );
 foreign_class!(
 	class Downloader {
-		fn Downloader::get_request_info(download_info : DownloadInfo , download_callback : & Box < dyn DownloadCallback > ,)->Option<RequestInfo>; alias getRequestInfo;
+		fn Downloader::get_request_info(download_info : & DownloadInfo , download_callback : & Box < dyn DownloadCallback > ,)->Option<RequestInfo>; alias getRequestInfo;
 	}
 );

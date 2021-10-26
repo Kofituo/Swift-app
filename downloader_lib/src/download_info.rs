@@ -1,4 +1,5 @@
-use crate::filetypes::TypeOfFile;
+use crate::filetypes::{FileType, TypeOfFile};
+use crate::to_bytes_format;
 use derive_new::new;
 use rifgen::rifgen_attr::*;
 
@@ -19,6 +20,7 @@ impl Authentication {
     }
 }
 
+#[derive(Clone)]
 pub struct DownloadInfo {
     url: String,
     pub auth: Option<Authentication>,
@@ -31,6 +33,7 @@ impl DownloadInfo {
     }
 
     #[generate_interface]
+    #[inline]
     pub fn get_url(&self) -> &str {
         &self.url
     }
@@ -56,7 +59,8 @@ pub struct RequestInfo {
     filename: String,
     ///File size in bytes
     file_size: Option<u64>,
-    category: TypeOfFile,
+    type_of_file: TypeOfFile,
+    resumable: bool,
 }
 
 impl RequestInfo {
@@ -67,15 +71,48 @@ impl RequestInfo {
         filename: String,
         file_size: Option<i64>,
         category: TypeOfFile,
+        resumable: bool,
     ) -> RequestInfo {
         RequestInfo {
             download_info,
             filename,
             file_size: file_size.map(|i| i as u64),
-            category,
+            type_of_file: category,
+            resumable,
         }
     }
+
+    #[generate_interface]
+    pub fn get_url(&self) -> &str {
+        self.download_info.get_url()
+    }
+
+    #[generate_interface]
+    pub fn get_file_size(&self) -> Option<String> {
+        self.file_size.map(|it| to_bytes_format!(it))
+    }
+
+    #[generate_interface]
+    pub fn is_resumable(&self) -> bool {
+        self.resumable
+    }
+
+    #[generate_interface]
+    pub fn type_of_file(&self) -> TypeOfFile {
+        self.type_of_file
+    }
+
+    #[generate_interface]
+    pub fn get_category(&self) -> FileCategory {
+        FileType::get_category(self.type_of_file)
+    }
+
+    #[generate_interface]
+    pub fn filename(&self) -> &str {
+        &self.filename
+    }
 }
+
 #[generate_interface]
 pub enum FileCategory {
     Video,

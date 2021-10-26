@@ -37,3 +37,12 @@ macro_rules! match_mime_type {
         }
     }};
 }
+
+#[macro_export]
+macro_rules! to_bytes_format {
+    ($int:expr) => {
+        byte_unit::Byte::from($int)
+            .get_appropriate_unit(true)
+            .format(2)
+    };
+}
