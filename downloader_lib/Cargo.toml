@@ -10,7 +10,7 @@ crate-type = ["cdylib"]
 
 
 [dependencies]
-rust_interface_file_generator = "*"
+rifgen = "*"
 jni-sys = "*"
 log = "*"
 log-panics="*"
@@ -18,7 +18,12 @@ android_logger = "*"
 serde_json = "*"
 serde = { version = "*", features = ["derive"] }
 derive-new = "*"
+reqwest = {version = "*", features = ["blocking"] }
+openssl = { version = "*", features = ["vendored"] }
+percent-encoding = "*"
+mime = '*'
+casey = "0.3.0"
 
 [build-dependencies]
-rust_interface_file_generator = "*"
+rifgen = "*"
 flapigen = { git = "https://github.com/Dushistov/flapigen-rs", rev = "fa3cd2c4d411f7e1eab7e0c17357a1d8a918c9b2" }

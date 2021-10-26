@@ -1,5 +1,5 @@
 use flapigen::LanguageConfig::JavaConfig;
-use rust_interface_file_generator::{Generator, Language, TypeCases};
+use rifgen::{Generator, Language, TypeCases};
 use std::env;
 use std::path::{Path, PathBuf};
 
@@ -14,7 +14,9 @@ fn main() {
     //std::fs::write("/home/kofi/Desktop/t.txt", &out_dir).unwrap();
     let out_src = Path::new(&out_dir).join("java_glue.rs");
     //delete the lib folder then create it again to prevent obsolete files from staying
-    let out_dir = path_buf!("C:\\Users\\taimoor\\Desktop\\Swift_final\\app\\src\\main\\java\\com\\example\\swift_final\\lib");
+    let out_dir = path_buf!(
+        "/home/kofi/StudioProjects/Swift-app/app/src/main/java/com/example/swift_final/lib"
+    );
     if out_dir.exists() {
         std::fs::remove_dir_all(&out_dir).unwrap();
     }
@@ -25,7 +27,7 @@ fn main() {
     ))
     .rustfmt_bindings(true);
     swig_gen.expand("android bindings", &in_src, &out_src);
-    println!("cargo:rerun-if-changed={}", "src");
+    println!("cargo:rerun-if-changed=src");
 }
 
 ///Creates a new [`PathBuf`] from the arguments

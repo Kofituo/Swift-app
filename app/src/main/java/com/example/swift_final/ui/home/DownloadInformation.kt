@@ -23,18 +23,23 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.ConstraintSet
 import androidx.constraintlayout.compose.Dimension
 import com.example.swift_final.R
+import com.example.swift_final.lib.DownloadCallback
 import com.example.swift_final.lib.DownloadInfo
+import com.example.swift_final.lib.FileCategory
+import com.example.swift_final.lib.ResponseErrors
 import com.example.swift_final.ui.*
 import com.example.swift_final.util.DisplayUtils
 import com.example.swift_final.util.DisplayUtils.ScreenPixels.Companion.widthInDp
 import com.example.swift_final.util.textFieldBorder
+import com.example.swift_final.ui.shimmer.shimmer
+
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun DownloadInfoDialog(
     downloadInfo: DownloadInfo?,
     showDialog: Boolean,
-    setShowDialog: (Boolean, DownloadInfo) -> Unit
+    setShowDialog: (DownloadInfo?) -> Unit
 ) {
     if (!showDialog) return
     requireNotNull(downloadInfo)
@@ -43,9 +48,10 @@ fun DownloadInfoDialog(
     val filesize = rememberSaveable { mutableStateOf("") }
     val category = rememberSaveable { mutableStateOf("") }
     val resumable = rememberSaveable { mutableStateOf("") }
+    val showShimmer by rememberSaveable { mutableStateOf(true) }
 
     Dialog(
-        onDismissRequest = { setShowDialog(false, downloadInfo) },
+        onDismissRequest = { setShowDialog(null) },
         properties = dialogProperties
     ) {
         val dialogShape = RoundedCornerShape(DialogRadius.dp)
@@ -84,7 +90,6 @@ fun DownloadInfoDialog(
                             top.linkTo(title.bottom, topMargin)
                         }
                         .fillMaxWidth(0.8f))
-                //TODO apply shimmer
                 ConstraintLayout(modifier = Modifier
                     .constrainAs(shimmer) {
                         bottom.linkTo(downloadButton.top)
@@ -93,6 +98,7 @@ fun DownloadInfoDialog(
                         top.linkTo(divider.bottom)
                         width = Dimension.fillToConstraints
                     }
+                    .shimmer(show = showShimmer)
                 ) {
                     val (urlBox, filenameBox, filesizeBox, resumeBox, categoryBox) = createRefs()
                     DownloadInfoTextField(
@@ -153,7 +159,6 @@ fun DownloadInfoDialog(
                         }, enabled = false
                     )
                 }
-
                 OutlinedButton(
                     onClick = { /*TODO*/ },
                     modifier =
@@ -175,6 +180,22 @@ fun DownloadInfoDialog(
             }
         }
     }
+
+    // load data
+
+    object : DownloadCallback {
+        override fun responseError(error: ResponseErrors) {
+        }
+
+        override fun statusError(error_code: Int, reason: String) {
+
+        }
+    }
+}
+
+@Composable
+private fun ProcessRequest() {
+
 }
 
 //TODO
@@ -280,6 +301,6 @@ private fun Category(valueHolder: MutableState<String>, modifier: Modifier) {
 }
 
 //TODO support more locales
-private val categories =
-    arrayOf("Video", "Document", "Image", "Compressed", "Audio", "Application", "Other")
+private val categories = FileCategory.values().map { it.name }
+
 private val topMargin = 14.dp

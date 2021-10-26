@@ -1,6 +1,6 @@
 use android_logger::Config;
 use log::Level;
-use rust_interface_file_generator::gen_attributes_interface_generator::*;
+use rifgen::rifgen_attr::*;
 
 pub struct Logger;
 

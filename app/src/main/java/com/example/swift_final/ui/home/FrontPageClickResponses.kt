@@ -44,7 +44,6 @@ fun OnAddUrlClicked(showDialog: Boolean, setShowDialog: (Boolean) -> Unit) {
     var password: String? by rememberSaveable { mutableStateOf(null) }
     Dialog(onDismissRequest = {
         setShowDialog(false)
-        //Log.e("dismmissed", "hyoyu $checkState")
     }, properties = dialogProperties) {
         val roundedCornerShape = RoundedCornerShape(DialogRadius.dp)
         Column(
@@ -132,14 +131,12 @@ fun OnAddUrlClicked(showDialog: Boolean, setShowDialog: (Boolean) -> Unit) {
                 OutlinedButton(
                     onClick = {
                         //check for invalid url
-                        //Jusg
                         if (dialogViewModel.initialText.value?.text.isNullOrBlank()) {
                             //set error
                             dialogViewModel.setIsError(true)
                             return@OutlinedButton
                         }
                         downloadInfoViewModel.setShowDialog(
-                            true,
                             DownloadInfoViewModel.newDownloadInfo(
                                 dialogViewModel.initialText.value?.text!!,
                                 checkState!!.value, userName, password

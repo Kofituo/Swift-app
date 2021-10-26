@@ -7,13 +7,13 @@ import com.example.swift_final.lib.Logger
 //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
 class ApplicationLoader:Application() {
     companion object {
-        private var _applicationContext: Context? = null
-        val applicationContext get() = requireNotNull(_applicationContext)
+        private var mApplicationContext: Context? = null
+        val applicationContext get() = requireNotNull(mApplicationContext)
     }
     override fun onCreate() {
-        _applicationContext = applicationContext
-        super.onCreate()
+        mApplicationContext = applicationContext
         System.loadLibrary("downloader_lib")
+        super.onCreate()
         Logger.initialiseLogging()
     }
 }

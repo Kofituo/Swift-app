@@ -11,9 +11,9 @@ class DownloadInfoViewModel : ViewModel() {
     val dialogShowing: LiveData<Boolean> get() = _dialogShowing
     private var _downloadInfo: DownloadInfo? = null
     val downloadInfo get() = _downloadInfo //since it can't be null when download information is opened
-    val setShowDialog = { shouldShow: Boolean, downloadInfo: DownloadInfo? ->
+    val setShowDialog = { downloadInfo: DownloadInfo? ->
         _downloadInfo = downloadInfo //set before calling compose function
-        _dialogShowing.value = shouldShow
+        _dialogShowing.value = downloadInfo != null
     }
 
     companion object {
@@ -22,23 +22,6 @@ class DownloadInfoViewModel : ViewModel() {
             useAuth: Boolean,
             username: String = "",
             password: String? = null
-        ) =
-            if (useAuth) DownloadInfo(url, Authentication(username, password))
-            else DownloadInfo(url, null)
+        ) = DownloadInfo(url, if (useAuth) Authentication(username, password) else null)
     }
-
-    /*data class DownloadInfo(val url: String, val authorisation: Authorisation? = null) {
-        companion object {
-            fun new(
-                url: String,
-                useAuth: Boolean,
-                username: String = "",
-                password: String? = null
-            ) =
-                if (useAuth) DownloadInfo(url, Authorisation(username, password))
-                else DownloadInfo(url)
-        }
-    }
-
-    data class Authorisation(val username: String, val password: String?)*/
 }
