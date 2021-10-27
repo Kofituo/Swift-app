@@ -1,7 +1,5 @@
 package com.example.swift_final.ui.home
 
-import android.content.ClipDescription
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -21,14 +19,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
-import androidx.core.content.getSystemService
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.swift_final.ApplicationLoader
 import com.example.swift_final.R
@@ -66,20 +62,17 @@ fun OnAddUrlClicked(showDialog: Boolean, setShowDialog: (Boolean) -> Unit) {
                         start.linkTo(parent.start)
                         top.linkTo(topGuideline)
                     })
-                //VerticalSpacer(space = 15)
                 AddressField(Modifier.constrainAs(urlBox) {
                     end.linkTo(parent.end)
                     start.linkTo(parent.start)
                     top.linkTo(title.bottom, topMargin)
                     width = Dimension.percent(0.88f)
                 })
-                //VerticalSpacer(space = 18)
                 checkState = useAuth(Modifier.constrainAs(useAuth) {
                     bottom.linkTo(usernameBox.top)
                     start.linkTo(startGuide)
                     top.linkTo(urlBox.bottom, topMargin)
                 })
-                //VerticalSpacer(space = 16)
                 OutlinedTextField(
                     value = run {
                         if (!checkBoxEnabled(checkState)) userName = ""
@@ -96,7 +89,6 @@ fun OnAddUrlClicked(showDialog: Boolean, setShowDialog: (Boolean) -> Unit) {
                         width = Dimension.percent(0.85f)
                     }
                 )
-                //VerticalSpacer(space = 16)
                 var showPassword by remember { mutableStateOf(false) }
                 OutlinedTextField(
                     value = run {
@@ -131,14 +123,14 @@ fun OnAddUrlClicked(showDialog: Boolean, setShowDialog: (Boolean) -> Unit) {
                 OutlinedButton(
                     onClick = {
                         //check for invalid url
-                        if (dialogViewModel.initialText.value?.text.isNullOrBlank()) {
+                        if (dialogViewModel.url.isBlank()) {
                             //set error
                             dialogViewModel.setIsError(true)
                             return@OutlinedButton
                         }
                         downloadInfoViewModel.setShowDialog(
                             DownloadInfoViewModel.newDownloadInfo(
-                                dialogViewModel.initialText.value?.text!!,
+                                dialogViewModel.url,
                                 checkState!!.value, userName, password
                             )
                         )
@@ -193,26 +185,16 @@ private fun useAuth(modifier: Modifier): MutableState<Boolean> {
 
 @Composable
 private fun AddressField(modifier: Modifier) {
-    //Get url from clipboard
     val dialogViewModel = viewModel<DialogViewModel>()
-    val initialValueState by dialogViewModel.initialText.observeAsState()
+    val url by dialogViewModel.urlLiveData.observeAsState()
     val isError by dialogViewModel.isError.observeAsState(false)
-    val value =
-        initialValueState
-            ?.let {
-                if (it.annotatedString.isBlank() && dialogViewModel.autoModifyInSection) null //means user changed
-                else it
-            } ?: setAddUrlTextField().also {
-            dialogViewModel.setInitialText(it)
-            //Log.e("called alsoe", "alsose ${dialogViewModel.autoModifyInSection}")
-        }
-    //Log.e("initttttttt", " |${initialValueState?.annotatedString}| ${setAddUrlTextField()} $value")
+
     OutlinedTextField(
-        value = value,
+        value = url ?: copiedUrl ?: "",
         onValueChange = {
-            dialogViewModel.setInitialText(it)
-            //means the user is updating the website
-            dialogViewModel.autoModifyInSection = false
+            //means the user is updating the url
+            dialogViewModel.setUrl(it)
+            dialogViewModel.isModified = true
             dialogViewModel.setIsError(false)
         },
         label = {
@@ -241,27 +223,6 @@ private fun AddressField(modifier: Modifier) {
             }
         } else null
     )
-    Log.e("com[ppin", "texxxxxxxxxxxxxffffffff ${dialogViewModel.autoModifyInSection}")
 }
-
-private fun geCopiedText(): String? {
-    val clipboardManager =
-        ApplicationLoader.applicationContext.getSystemService<android.content.ClipboardManager>()
-    return clipboardManager?.run {
-        val containsText =
-            primaryClipDescription?.hasMimeType(ClipDescription.MIMETYPE_TEXT_PLAIN)
-                ?: false
-        Log.e(
-            "contains text",
-            "dsdcasc $containsText $primaryClip ${
-                primaryClip?.description?.hasMimeType(ClipDescription.MIMETYPE_TEXT_PLAIN)
-            }"
-        )
-        if (containsText) primaryClip?.getItemAt(0)?.text?.toString() else null
-    }
-}
-
-fun setAddUrlTextField() =
-    TextFieldValue(geCopiedText()?.let { if (it.isUrl) it else null } ?: "")
 
 private val topMargin = 12.dp

@@ -6,6 +6,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -37,10 +38,7 @@ import com.example.swift_final.util.DisplayUtils.ScreenPixels.Companion.widthInD
 import com.example.swift_final.util.textFieldBorder
 import com.example.swift_final.ui.shimmer.shimmer
 import com.example.swift_final.util.HorizontalSpacer
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import kotlin.time.ExperimentalTime
 import kotlin.time.measureTimedValue
 

@@ -1,38 +1,35 @@
 package com.example.swift_final.ui.home
 
-import android.util.Log
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.swift_final.util.isUrl
 
 class DialogViewModel : ViewModel() {
 
     private val _dialogShowing = MutableLiveData(false)
     val dialogShowing: LiveData<Boolean> get() = _dialogShowing
+    inline val dialogIsShowing get() = dialogShowing.value ?: false
+    var isModified = false
+
     val setShowDialog = { shouldShow: Boolean ->
         _dialogShowing.value = shouldShow
         //dialog is dismissed so reset
         if (!shouldShow) {
             setIsError(false)
-            autoModifyInSection = true
-            _initialText.value = null
-            Log.e("trueeeeeeee", "$autoModifyInSection ${initialText.value}")
+            _url.value = null
+            isModified = false
         }
     }
 
-    private var _initialText: MutableLiveData<TextFieldValue?> = MutableLiveData()
-    var autoModifyInSection = true
-    val initialText: LiveData<TextFieldValue?> get() = _initialText
-    fun setInitialText(textFieldValue: TextFieldValue) {
-        _initialText.value = textFieldValue
+    private var _url: MutableLiveData<String?> = MutableLiveData()
+    val url get() = _url.value ?: ""
+    val urlLiveData: LiveData<String?> get() = _url
+    fun setUrl(url: String) {
+        this._url.value = url
     }
 
     private val _isError = MutableLiveData(false)
-    val isError:LiveData<Boolean> get() = _isError
+    val isError: LiveData<Boolean> get() = _isError
     fun setIsError(isError: Boolean) {
         _isError.value = isError
     }
