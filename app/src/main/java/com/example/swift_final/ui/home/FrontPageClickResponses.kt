@@ -33,13 +33,14 @@ import com.example.swift_final.util.*
 import com.example.swift_final.util.DisplayUtils.ScreenPixels.Companion.widthInDp
 
 @Composable
-fun OnAddUrlClicked(showDialog: Boolean, setShowDialog: (Boolean) -> Unit) {
+fun OnAddUrlClicked(showDialog: Boolean) {
     if (!showDialog) return
     var checkState: MutableState<Boolean>?
     var userName by rememberSaveable { mutableStateOf("") }
     var password: String? by rememberSaveable { mutableStateOf(null) }
+    val dialogViewModel = viewModel<DialogViewModel>()
     Dialog(onDismissRequest = {
-        setShowDialog(false)
+        dialogViewModel.setShowDialog(false)
     }, properties = dialogProperties) {
         val roundedCornerShape = RoundedCornerShape(DialogRadius.dp)
         Column(
@@ -118,7 +119,6 @@ fun OnAddUrlClicked(showDialog: Boolean, setShowDialog: (Boolean) -> Unit) {
                     },
                 )
                 //VerticalSpacer(space = 15)
-                val dialogViewModel = viewModel<DialogViewModel>()
                 val downloadInfoViewModel = viewModel<DownloadInfoViewModel>()
                 OutlinedButton(
                     onClick = {
@@ -134,7 +134,7 @@ fun OnAddUrlClicked(showDialog: Boolean, setShowDialog: (Boolean) -> Unit) {
                                 checkState!!.value, userName, password
                             )
                         )
-                        setShowDialog(false)
+                        dialogViewModel.setShowDialog(false)
                     },
                     shape = textFieldShape,
                     modifier = Modifier
@@ -186,11 +186,11 @@ private fun useAuth(modifier: Modifier): MutableState<Boolean> {
 @Composable
 private fun AddressField(modifier: Modifier) {
     val dialogViewModel = viewModel<DialogViewModel>()
+    if (!dialogViewModel.dialogIsShowing) return
     val url by dialogViewModel.urlLiveData.observeAsState()
     val isError by dialogViewModel.isError.observeAsState(false)
-
     OutlinedTextField(
-        value = url ?: copiedUrl ?: "",
+        value = url ?: copiedUrl?.also { dialogViewModel.setUrl(it) } ?: "",
         onValueChange = {
             //means the user is updating the url
             dialogViewModel.setUrl(it)
