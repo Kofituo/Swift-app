@@ -2,17 +2,6 @@
 use crate::*;
 use jni_sys::*;
 foreign_enum!(
-	enum FileCategory {
-		Video = FileCategory::Video,
-		Document = FileCategory::Document,
-		Image = FileCategory::Image,
-		Compressed = FileCategory::Compressed,
-		Audio = FileCategory::Audio,
-		Application = FileCategory::Application,
-		Other = FileCategory::Other,
-	}
-);
-foreign_enum!(
 	enum TypeOfFile {
 		Word = TypeOfFile::Word,
 		Excel = TypeOfFile::Excel,
@@ -39,18 +28,23 @@ foreign_enum!(
 	}
 );
 foreign_enum!(
+	enum FileCategory {
+		Video = FileCategory::Video,
+		Document = FileCategory::Document,
+		Image = FileCategory::Image,
+		Compressed = FileCategory::Compressed,
+		Audio = FileCategory::Audio,
+		Application = FileCategory::Application,
+		Other = FileCategory::Other,
+	}
+);
+foreign_enum!(
 	enum ResponseErrors {
 		ErrorParsingRequest = ResponseErrors::ErrorParsingRequest,
 		UnableToDecodeRequest = ResponseErrors::UnableToDecodeRequest,
 		RedirectedManyTimes = ResponseErrors::RedirectedManyTimes,
 		ConnectionTimeout = ResponseErrors::ConnectionTimeout,
 		UnknownError = ResponseErrors::UnknownError,
-	}
-);
-foreign_class!(
-	class Logger {
-		# [doc = "Set up logging"]
-		fn Logger::initialise_logging(); alias initialiseLogging;
 	}
 );
 foreign_class!(
@@ -84,6 +78,7 @@ foreign_callback!(
 		self_type DownloadCallback;
 		responseError = DownloadCallback::response_error(& self , error : ResponseErrors);
 		statusError = DownloadCallback::status_error(& self , error_code : u16 , reason : & str);
+		isActive = DownloadCallback::is_active(& self)->bool;
 	}
 );
 foreign_class!(
@@ -97,5 +92,11 @@ foreign_class!(
 		constructor FileType::new(extension : & str)->FileType;
 		fn FileType::get_type(& self)->TypeOfFile; alias getType;
 		fn FileType::get_category(type_of_file : TypeOfFile)->FileCategory; alias getCategory;
+	}
+);
+foreign_class!(
+	class Logger {
+		# [doc = "Set up logging"]
+		fn Logger::initialise_logging(); alias initialiseLogging;
 	}
 );

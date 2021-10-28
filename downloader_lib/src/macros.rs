@@ -27,18 +27,6 @@ macro_rules! get_type_sc {
 }
 
 #[macro_export]
-macro_rules! match_mime_type {
-    ($mime_type:expr,$($types:tt),+) => {{
-        match $mime_type {
-            $(
-                casey::upper!($types) => TypeOfFile::$types,
-            )+
-            _=>TypeOfFile::default()
-        }
-    }};
-}
-
-#[macro_export]
 macro_rules! to_bytes_format {
     ($int:expr) => {
         byte_unit::Byte::from($int)

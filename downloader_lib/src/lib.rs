@@ -17,6 +17,7 @@ use reqwest::header::{ACCEPT_RANGES, CONTENT_DISPOSITION, CONTENT_TYPE};
 use crate::download_callback::DownloadCallback;
 use crate::errors::ResponseErrors;
 use crate::filetypes::TypeOfFile;
+use log::Level;
 use mime::Mime;
 use rifgen::rifgen_attr::*;
 use std::path::PathBuf;
@@ -46,6 +47,11 @@ impl Downloader {
     ) -> Option<RequestInfo> {
         let mut error = None;
         for _ in 0..TIMEOUT {
+            //should only execute if it's active
+            if !download_callback.is_active() {
+                log::log!(Level::Error, "not active");
+                return None;
+            }
             let mut builder = reqwest::blocking::Client::new().get(download_info.get_url());
             if let Some(val) = &download_info.auth {
                 builder = builder.basic_auth(&val.username, val.password.as_ref());
@@ -119,14 +125,43 @@ impl Downloader {
                 };
                 name_path.set_extension(&ext);
                 (
-                    FileType::new(&ext).get_type(),
+                    //get_type isn't exhaustive so we fall back to mime type
+                    match FileType::new(&ext).get_type() {
+                        TypeOfFile::Other => Downloader::get_mime_type(response),
+                        ty => ty,
+                    },
                     format!("{}", name_path.to_string_lossy()),
                 )
             }
             Some(ext) => (
-                FileType::new(ext.to_string_lossy().as_ref()).get_type(),
+                match FileType::new(ext.to_string_lossy().as_ref()).get_type() {
+                    TypeOfFile::Other => Downloader::get_mime_type(response),
+                    ty => ty,
+                },
                 name_from_url,
             ),
+        }
+    }
+
+    fn get_mime_type(response: &Response) -> TypeOfFile {
+        match response.headers().get(CONTENT_TYPE) {
+            None => TypeOfFile::Other,
+            Some(content_type) => {
+                let mut ret = TypeOfFile::default();
+                if let Ok(string) = content_type.to_str() {
+                    if let Ok(mime) = Mime::from_str(string) {
+                        //
+                        ret = match mime.type_() {
+                            mime::APPLICATION => TypeOfFile::Application,
+                            mime::AUDIO => TypeOfFile::Audio,
+                            mime::VIDEO => TypeOfFile::Video,
+                            mime::IMAGE => TypeOfFile::Image,
+                            _ => TypeOfFile::default(),
+                        };
+                    }
+                }
+                ret
+            }
         }
     }
 

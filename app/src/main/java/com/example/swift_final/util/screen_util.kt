@@ -4,6 +4,8 @@ import android.content.res.Configuration
 import android.util.Log
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.currentComposer
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.example.swift_final.ApplicationLoader
 import kotlin.math.sqrt
@@ -53,11 +55,9 @@ object DisplayUtils {
         }
     }
 
-    val isPortrait
-        get() = ApplicationLoader.applicationContext.resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT
-
     val isLandscape
-        get() = ApplicationLoader.applicationContext.resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT
+        @Composable get() =
+            LocalContext.current.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
 
     /*@Composable
     fun <T> useOnUiMode(light: T, dark: T) = if (isSystemInDarkTheme()) dark else light*/

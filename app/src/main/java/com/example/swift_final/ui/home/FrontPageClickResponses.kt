@@ -33,12 +33,12 @@ import com.example.swift_final.util.*
 import com.example.swift_final.util.DisplayUtils.ScreenPixels.Companion.widthInDp
 
 @Composable
-fun OnAddUrlClicked(showDialog: Boolean) {
+fun OnAddUrlClicked(dialogViewModel: DialogViewModel) {
+    val showDialog by dialogViewModel.dialogShowing.observeAsState(false)
     if (!showDialog) return
     var checkState: MutableState<Boolean>?
     var userName by rememberSaveable { mutableStateOf("") }
     var password: String? by rememberSaveable { mutableStateOf(null) }
-    val dialogViewModel = viewModel<DialogViewModel>()
     Dialog(onDismissRequest = {
         dialogViewModel.setShowDialog(false)
     }, properties = dialogProperties) {
@@ -63,7 +63,7 @@ fun OnAddUrlClicked(showDialog: Boolean) {
                         start.linkTo(parent.start)
                         top.linkTo(topGuideline)
                     })
-                AddressField(Modifier.constrainAs(urlBox) {
+                AddressField(dialogViewModel,Modifier.constrainAs(urlBox) {
                     end.linkTo(parent.end)
                     start.linkTo(parent.start)
                     top.linkTo(title.bottom, topMargin)
@@ -184,8 +184,7 @@ private fun useAuth(modifier: Modifier): MutableState<Boolean> {
 }
 
 @Composable
-private fun AddressField(modifier: Modifier) {
-    val dialogViewModel = viewModel<DialogViewModel>()
+private fun AddressField(dialogViewModel: DialogViewModel, modifier: Modifier) {
     if (!dialogViewModel.dialogIsShowing) return
     val url by dialogViewModel.urlLiveData.observeAsState()
     val isError by dialogViewModel.isError.observeAsState(false)

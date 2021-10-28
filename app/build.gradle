@@ -87,6 +87,7 @@ def archTriplets = [
 
 // TODO: only pass --release if buildType is release
 archTriplets.each { arch, target ->
+    return
     // execute cargo metadata and get path to target directory
 /*tasks.create(name: "cargo-output-dir-${arch}", description: "Get cargo metadata") {
         new ByteArrayOutputStream().withStream { os ->

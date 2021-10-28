@@ -39,9 +39,8 @@ fun FrontPageContent(paddingValues: PaddingValues) {
     ) {
         Spacer(modifier = Modifier.height(20.dp))
         val dialogViewModel: DialogViewModel = viewModel()
-        val showDialog by dialogViewModel.dialogShowing.observeAsState(false)
         // Create alert dialog, pass the showDialog state to this Composable
-        OnAddUrlClicked(showDialog = showDialog)
+        OnAddUrlClicked(dialogViewModel = dialogViewModel)
         val downloadInfoViewModel = viewModel<DownloadInfoViewModel>()
         val showDownloadInfoViewDialog by downloadInfoViewModel.dialogShowing.observeAsState(initial = false)
         DownloadInfoDialog(
