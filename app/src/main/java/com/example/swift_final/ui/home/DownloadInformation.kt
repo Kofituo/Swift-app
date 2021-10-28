@@ -21,6 +21,7 @@ import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.constraintlayout.compose.ConstraintLayout
@@ -93,14 +94,16 @@ fun DownloadInfoDialog(
                     Text(
                         text = "${stringResource(id = R.string.url)}: ",
                         modifier = Modifier.layoutId(ConstraintIds.Url),
-                        fontSize = defaultFontSize
+                        fontSize = defaultFontSize,
                     )
                     Text(
                         text = url.value,
                         modifier = Modifier
                             .layoutId(ConstraintIds.UrlShimmer)
                             .shimmer(show = showSimmer),
-                        fontSize = defaultFontSize
+                        fontSize = defaultFontSize,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
                     Text(
                         text = "${stringResource(id = R.string.file_name)}: ",
