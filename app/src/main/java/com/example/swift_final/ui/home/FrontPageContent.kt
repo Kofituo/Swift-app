@@ -7,9 +7,12 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -18,12 +21,12 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.swift_final.R
+import com.example.swift_final.ui.*
 import com.example.swift_final.util.DisplayUtils
 import com.example.swift_final.util.DisplayUtils.ScreenPixels.Companion.widthInDp
 import com.example.swift_final.util.HorizontalSpacer
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.swift_final.ui.*
 import com.example.swift_final.util.VerticalSpacer
 import com.example.swift_final.util.textFieldBorder
 
@@ -43,10 +46,15 @@ fun FrontPageContent(paddingValues: PaddingValues) {
         OnAddUrlClicked(dialogViewModel = dialogViewModel)
         val downloadInfoViewModel = viewModel<DownloadInfoViewModel>()
         val showDownloadInfoViewDialog by downloadInfoViewModel.dialogShowing.observeAsState(initial = false)
+        val sendRequest by downloadInfoViewModel.sendRequest.observeAsState(initial = true)
+
         DownloadInfoDialog(
             downloadInfoViewModel.downloadInfo,
             showDialog = showDownloadInfoViewDialog,
-            setShowDialog = downloadInfoViewModel.setShowDialog
+            setShowDialog = downloadInfoViewModel.setShowDialog,
+            sendRequest = sendRequest,
+            setSendRequest = downloadInfoViewModel.setSendRequest,
+            setSuccess = downloadInfoViewModel.setSuccess
         )
         OutlinedButton(
             onClick = { dialogViewModel.setShowDialog(true) },

@@ -1,6 +1,5 @@
 package com.example.swift_final.ui.home
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -23,7 +22,6 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.ConstraintSet
@@ -38,6 +36,7 @@ import com.example.swift_final.util.DisplayUtils.ScreenPixels.Companion.widthInD
 import com.example.swift_final.util.HorizontalSpacer
 import com.example.swift_final.util.textFieldBorder
 import kotlinx.coroutines.*
+import java.io.Serializable
 import java.util.*
 import kotlin.time.ExperimentalTime
 
@@ -46,7 +45,10 @@ import kotlin.time.ExperimentalTime
 fun DownloadInfoDialog(
     downloadInfo: DownloadInfo?,
     showDialog: Boolean,
-    setShowDialog: (DownloadInfo?) -> Unit
+    setShowDialog: (DownloadInfo?) -> Unit,
+    sendRequest: Boolean,
+    setSendRequest: (Boolean) -> Unit,
+    setSuccess: () -> Unit
 ) {
     if (!showDialog) return
     requireNotNull(downloadInfo)
@@ -243,10 +245,11 @@ fun DownloadInfoDialog(
             }
         }
     }
-    var sendRequest by rememberSaveable { mutableStateOf(true) }
+
     var errorDialogData: ErrorDialogData? by rememberSaveable { mutableStateOf(null) }
 
     if (sendRequest) {
+        errorDialogData = null
         LaunchedEffect(true) {
             val callback = object : DownloadCallback {
                 var shouldDismiss = true
@@ -261,13 +264,12 @@ fun DownloadInfoDialog(
                         body = ApplicationLoader.getString(resId),
                         onDialogDismiss = {
                             errorDialogData = null
-                            if (shouldDismiss)
-                                setShowDialog(null)
+                            if (shouldDismiss) setShowDialog(null)
                         },
                         confirmButtonText = ApplicationLoader.getString(R.string.retry),
                         confirmButtonCallback = {
                             errorDialogData = null
-                            sendRequest = true
+                            setSendRequest(true)
                             shouldDismiss = false
                         },
                         dismissButtonText = ApplicationLoader.getString(R.string.cancel),
@@ -278,13 +280,19 @@ fun DownloadInfoDialog(
                 }
 
                 override fun statusError(error_code: Int, reason: String) {
+                    //no retry
+                    setSuccess()
                     errorDialogData = ErrorDialogData(
                         title = "${ApplicationLoader.getString(R.string.status_code)} $error_code",
                         body = "${ApplicationLoader.getString(R.string.reason)} $reason",
-                        onDialogDismiss = { errorDialogData = null },
+                        onDialogDismiss = {
+                            errorDialogData = null
+                            setShowDialog(null)
+                        },
                         confirmButtonText = ApplicationLoader.getString(R.string.cancel),
                         confirmButtonCallback = {
                             errorDialogData = null
+                            setShowDialog(null)
                             //sendRequest = true no retry
                         }
                     )
@@ -292,12 +300,12 @@ fun DownloadInfoDialog(
 
                 override fun isActive() = this@LaunchedEffect.isActive
             }
-
             withContext(Dispatchers.IO) {
                 val info = Downloader.getRequestInfo(downloadInfo, callback)
-                sendRequest = false
+                this@LaunchedEffect.launch { setSendRequest(false) }
                 if (info != null) {
                     //success
+                    setSuccess()
                     errorDialogData = null
                     filename.value = info.filename()
                     filesize.value =
@@ -332,7 +340,7 @@ data class ErrorDialogData(
     var confirmButtonCallback: () -> Unit,
     var dismissButtonText: String? = null,
     var dismissButtonCallback: (() -> Unit)? = null,
-)
+) : Serializable
 
 private fun getImageId(typeOfFile: TypeOfFile?) =
     when (typeOfFile) {
@@ -631,7 +639,7 @@ private fun Category(
             readOnly = true,
             trailingIcon = {
                 //TODO animate between the 2 icons
-                IconButton(onClick = { isExpanded = !isExpanded }) {
+                IconButton(onClick = { isExpanded = enabled && !isExpanded }) {
                     Icon(
                         imageVector = if (isExpanded) Icons.Filled.ArrowDropUp else Icons.Filled.ArrowDropDown,
                         contentDescription = stringResource(id = R.string.categories)
