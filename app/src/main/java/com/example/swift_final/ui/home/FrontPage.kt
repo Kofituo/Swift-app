@@ -1,66 +1,48 @@
 package com.example.swift_final.ui.home
 
-import androidx.compose.foundation.layout.size
-import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.Scaffold
+import androidx.compose.material.ScaffoldState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.example.swift_final.R
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import com.example.swift_final.Screens
+import com.example.swift_final.ui.unfinished_downloads.UnfinishedPage
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 @Composable
-fun FrontPage() {
-    val scaffoldState = rememberScaffoldState()
-    val scope = rememberCoroutineScope()
+fun FrontPage(
+    navController: NavHostController,
+    scope: CoroutineScope,
+    scaffoldState: ScaffoldState
+) {
     Scaffold(
         scaffoldState = scaffoldState,
-        drawerContent = { Drawer.DrawerContent() },
+        drawerContent = {
+            Drawer.DrawerContent(
+                navController
+            ) { scope.launch { scaffoldState.drawerState.close() } }
+        },
         drawerShape = Drawer.drawerShape(),
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        "Swift",
-                        fontSize = 36.sp,
-                        fontFamily = FontFamily.Serif,
-                        fontStyle = FontStyle.Italic
-                    )
-                },
-                navigationIcon = {
-                    IconButton(
-                        onClick = {
-                            scope.launch { scaffoldState.drawerState.open() }
-                        }
-                    ) {
-                        Icon(
-                            Icons.Filled.Menu,
-                            contentDescription = stringResource(id = R.string.menu),
-                            Modifier.size(28.dp)
-                        )
-                    }
-                },
-                actions = {
-                    IconButton(onClick = { /*TODO*/ }) {
-                        Icon(
-                            imageVector = Icons.Filled.Search,
-                            contentDescription = stringResource(id = R.string.search),
-                            Modifier.size(28.dp)
-                        )
-                    }
-                }
-            )
-        },
+        topBar = {},
         content = { innerPadding ->
-            FrontPageContent(innerPadding)
+            NavHost(navController = navController, startDestination = Screens.FrontPage.name) {
+                val openDrawer = {
+                    scope.launch { scaffoldState.drawerState.open() }
+                    Unit // really??
+                }
+                composable(Screens.FrontPage.name) {
+                    FrontPageContent(
+                        navController,
+                        openDrawer = openDrawer,
+                        innerPadding
+                    )
+                }
+                composable(Screens.UnfinishedDownloads.name) {
+                    UnfinishedPage(navController = navController)
+                }
+            }
         },
-        //backgroundColor = Color.Gray
     )
 }

@@ -19,7 +19,9 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.navigation.NavController
 import com.example.swift_final.R
+import com.example.swift_final.Screens
 import com.example.swift_final.ui.DrawerButtonPadding
 import com.example.swift_final.ui.DrawerRadius
 import com.example.swift_final.util.DisplayUtils
@@ -27,6 +29,7 @@ import com.example.swift_final.util.DisplayUtils.ScreenPixels.Companion.heightIn
 import com.example.swift_final.util.DisplayUtils.isTablet
 import com.example.swift_final.util.HorizontalSpacer
 import com.example.swift_final.util.VerticalSpacer
+import com.example.swift_final.util.navigateSingleTop
 
 object Drawer {
     fun drawerShape() =
@@ -54,13 +57,14 @@ object Drawer {
 
     @Composable
     //Very dynamic drawer content
-    fun DrawerContent() {
+    fun DrawerContent(navController: NavController, closeDrawer: () -> Unit) {
         Column(
             modifier = Modifier
                 .verticalScroll(rememberScrollState())
         ) {
             //header
             DrawerHeader()
+            Log.e("called","drawer")
             //If update show update
             Text(text = "let's gpp", modifier = Modifier
                 .clickable {
@@ -78,12 +82,15 @@ object Drawer {
                 iconResource = R.drawable.ic_folders,
                 labelResource = R.string.downloaded
             ) {
+            }
+            DrawerButtons(
+                iconResource = R.drawable.ic_download_bordered,
+                labelResource = R.string.unfinished
+            ) {
+                navController.navigateSingleTop(Screens.UnfinishedDownloads.name)
+                closeDrawer()
+            }
 
-            }
-            DrawerButtons(iconResource = R.drawable.ic_download_bordered, labelResource = R.string.unfinished) {
-                
-            }
-            
             DrawerButtons(
                 iconResource = android.R.drawable.ic_menu_search,
                 labelResource = R.string.find
@@ -91,15 +98,15 @@ object Drawer {
             }
 
             DrawerButtons(iconResource = R.drawable.ic_settings, labelResource = R.string.options) {
-                
+
             }
             DrawerButtons(
                 iconResource = android.R.drawable.ic_dialog_info,
                 labelResource = R.string.help
             ) {
-                
+
             }
-            
+
             DrawerButtons(
                 iconResource = R.drawable.ic_share,
                 labelResource = R.string.tell_friend

@@ -41,4 +41,8 @@
     <string name="retry">Retry</string>
     <string name="cancel">Cancel</string>
     <string name="unknown_size">Unknown Size</string>
+    <string name="title_activity_finished">FinishedActivity</string>
+    <string name="no_downloads">You haven\'t started any downloads yet</string>
+    <string name="title_activity_unfinished_downloads">UnfinishedDownloadsActivity</string>
+    <string name="no_uncompleted_downloads">"    You have no uncompleted downloads"</string>
 </resources>

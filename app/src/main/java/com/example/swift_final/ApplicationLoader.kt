@@ -10,6 +10,7 @@ class ApplicationLoader : Application() {
         private var mApplicationContext: Context? = null
         val applicationContext get() = requireNotNull(mApplicationContext)
         fun getString(id: Int) = applicationContext.resources.getString(id)
+        const val APP_NAME = "com.otuolabs.swift"
     }
 
     override fun onCreate() {

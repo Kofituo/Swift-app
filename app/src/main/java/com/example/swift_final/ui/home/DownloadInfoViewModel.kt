@@ -16,10 +16,10 @@ import kotlinx.coroutines.launch
 class DownloadInfoViewModel : ViewModel() {
     private val _dialogShowing = MutableLiveData(false)
     val dialogShowing: LiveData<Boolean> get() = _dialogShowing
-    private var _downloadInfo: DownloadInfo? = null
-    val downloadInfo get() = _downloadInfo //since it can't be null when download information is opened
+    var downloadInfo: DownloadInfo? = null
+        private set
     val setShowDialog = { downloadInfo: DownloadInfo? ->
-        _downloadInfo = downloadInfo //set before calling compose function
+        this.downloadInfo = downloadInfo //set before calling compose function
         _dialogShowing.value = downloadInfo != null
         if (downloadInfo == null) { //means we're closing the dialog
             _sendRequest.value = true

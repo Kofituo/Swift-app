@@ -2,6 +2,9 @@ package com.example.swift_final.ui.home
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
@@ -9,8 +12,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import com.example.swift_final.R
+import com.example.swift_final.Screens
 
 @Composable
 private fun AppBar(
@@ -96,6 +103,36 @@ fun TopAppBar(
             )
         }
     }
+}
+
+@Composable
+fun DownloadsTopBar(title: Int, navController: NavController) {
+    androidx.compose.material.TopAppBar(
+        title = { Text(text = stringResource(id = title)) },
+        navigationIcon = {
+            IconButton(onClick = {
+                navController.popBackStack(
+                    route = Screens.FrontPage.name,
+                    inclusive = false
+                )
+                // in case the app was left for a long time and the user returned and
+                // met the current composable and can't go back??
+                // doesn't seem like a valid situation
+            }) {
+                Icon(
+                    Icons.Filled.ArrowBack,
+                    contentDescription = stringResource(id = R.string.menu),
+                )
+            }
+        },
+        actions = {
+            IconButton(onClick = { /*TODO*/ }) {
+                Icon(
+                    imageVector = Icons.Filled.Search,
+                    contentDescription = stringResource(id = R.string.search),
+                )
+            }
+        })
 }
 
 // TODO: this should probably be part of the touch target of the start and end icons, clarify this

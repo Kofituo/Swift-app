@@ -1,6 +1,8 @@
 package com.example.swift_final.util
 
 import android.content.ClipDescription
+import android.content.Context
+import android.content.SharedPreferences
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
@@ -8,10 +10,13 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.core.content.getSystemService
+import androidx.navigation.NavController
 import com.example.swift_final.ApplicationLoader
+import com.example.swift_final.ApplicationLoader.Companion.APP_NAME
 
 /**
  * Adds vertical [space] in [dp]
@@ -42,3 +47,28 @@ val copiedText: String?
     }
 
 inline val copiedUrl get() = copiedText?.let { if (it.isUrl) it else null }
+
+fun NavController.navigateSingleTop(route: String) = navigate(route = route) {
+    launchSingleTop = true
+}
+
+inline fun <reified T> SharedPreferences.get(key: String, block: T.() -> Unit = {}): T =
+    when (T::class) {
+        Boolean::class -> (getBoolean(key, false) as T).apply(block)
+        String::class -> (getString(key, null) as T).apply(block)
+        Int::class -> (getInt(key, -1) as T).apply(block)
+        Long::class -> (getLong(key, -1) as T).apply(block)
+        Float::class -> (getFloat(key, -1f) as T).apply(block)
+        Set::class -> (getStringSet(key, null) as T).apply(block)
+        else -> TODO()
+    }
+
+@Composable
+fun sharedPreferences(key: String) =
+    LocalContext.current.getSharedPreferences(key, Context.MODE_PRIVATE)
+
+object SharedPreferencesConstants {
+    /*** Identifier to receive the list of unfinished downloads ***/
+    const val UnfinishedDownloads = "$APP_NAME.unfinished download"
+    const val HasDownloads = "has downloads"
+}

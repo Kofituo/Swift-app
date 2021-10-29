@@ -39,19 +39,6 @@ impl DownloadInfo {
     }
 }
 
-///Holds information about the download when it's paused
-#[derive(Debug, serde::Serialize, serde::Deserialize, new)]
-struct SaveInfo {
-    ///Total length of the file if specified by the site
-    total_length: Option<u64>,
-    ///Amount of bytes downloaded
-    downloaded_length: u64,
-    ///Authentication if any
-    auth: Option<Authentication>,
-    ///Chosen category
-    category: String,
-}
-
 #[generate_interface_doc]
 /// Struct to hold information received from the server
 pub struct RequestInfo {

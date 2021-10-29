@@ -48,6 +48,14 @@ foreign_enum!(
 	}
 );
 foreign_class!(
+	class FileType {
+		self_type FileType;
+		constructor FileType::new(extension : & str)->FileType;
+		fn FileType::get_type(& self)->TypeOfFile; alias getType;
+		fn FileType::get_category(type_of_file : TypeOfFile)->FileCategory; alias getCategory;
+	}
+);
+foreign_class!(
 	class Authentication {
 		self_type Authentication;
 		constructor Authentication::new(username : String , password : Option < & str >)->Authentication;
@@ -84,14 +92,6 @@ foreign_callback!(
 foreign_class!(
 	class Downloader {
 		fn Downloader::get_request_info(download_info : & DownloadInfo , download_callback : & Box < dyn DownloadCallback > ,)->Option<RequestInfo>; alias getRequestInfo;
-	}
-);
-foreign_class!(
-	class FileType {
-		self_type FileType;
-		constructor FileType::new(extension : & str)->FileType;
-		fn FileType::get_type(& self)->TypeOfFile; alias getType;
-		fn FileType::get_category(type_of_file : TypeOfFile)->FileCategory; alias getCategory;
 	}
 );
 foreign_class!(
