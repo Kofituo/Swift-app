@@ -66,19 +66,22 @@ foreign_class!(
 		self_type DownloadInfo;
 		constructor DownloadInfo::constructor(url : String , auth : Option < Authentication >)->DownloadInfo;
 		fn DownloadInfo::get_url(& self)->&str; alias getUrl;
+		fn DownloadInfo::copy(& self)->DownloadInfo; alias copy;
 	}
 );
 foreign_class!(
 	# [doc = " Struct to hold information received from the server"]
 	class RequestInfo {
 		self_type RequestInfo;
-		constructor RequestInfo::new(download_info : DownloadInfo , filename : String , file_size : Option < i64 > , category : TypeOfFile , resumable : bool ,)->RequestInfo;
+		constructor RequestInfo::new(download_info : DownloadInfo , filename : String , file_size : i64 , category : TypeOfFile , resumable : bool ,)->RequestInfo;
 		fn RequestInfo::get_url(& self)->&str; alias getUrl;
 		fn RequestInfo::get_file_size(& self)->Option<String>; alias getFileSize;
+		fn RequestInfo::get_file_size_in_bytes(& self)->u64; alias getFileSizeInBytes;
 		fn RequestInfo::is_resumable(& self)->bool; alias isResumable;
 		fn RequestInfo::type_of_file(& self)->TypeOfFile; alias typeOfFile;
 		fn RequestInfo::get_category(& self)->FileCategory; alias getCategory;
 		fn RequestInfo::filename(& self)->&str; alias filename;
+		fn RequestInfo::to_string(& self)->String; alias toString;
 	}
 );
 foreign_callback!(

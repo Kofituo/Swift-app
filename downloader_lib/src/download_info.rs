@@ -20,7 +20,7 @@ impl Authentication {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, serde::Serialize, serde::Deserialize)]
 pub struct DownloadInfo {
     url: String,
     pub auth: Option<Authentication>,
@@ -37,9 +37,16 @@ impl DownloadInfo {
     pub fn get_url(&self) -> &str {
         &self.url
     }
+
+    #[generate_interface]
+    //TODO remove function
+    pub fn copy(&self) -> DownloadInfo {
+        self.clone()
+    }
 }
 
 #[generate_interface_doc]
+#[derive(serde::Serialize, serde::Deserialize)]
 /// Struct to hold information received from the server
 pub struct RequestInfo {
     download_info: DownloadInfo,
@@ -56,14 +63,18 @@ impl RequestInfo {
     pub fn new(
         download_info: DownloadInfo,
         filename: String,
-        file_size: Option<i64>,
+        file_size: i64,
         category: TypeOfFile,
         resumable: bool,
     ) -> RequestInfo {
         RequestInfo {
             download_info,
             filename,
-            file_size: file_size.map(|i| i as u64),
+            file_size: if file_size == 0 {
+                None
+            } else {
+                Some(file_size as u64)
+            },
             type_of_file: category,
             resumable,
         }
@@ -77,6 +88,11 @@ impl RequestInfo {
     #[generate_interface]
     pub fn get_file_size(&self) -> Option<String> {
         self.file_size.map(|it| to_bytes_format!(it))
+    }
+
+    #[generate_interface]
+    pub fn get_file_size_in_bytes(&self) -> u64 {
+        self.file_size.unwrap_or_default()
     }
 
     #[generate_interface]
@@ -97,6 +113,11 @@ impl RequestInfo {
     #[generate_interface]
     pub fn filename(&self) -> &str {
         &self.filename
+    }
+
+    #[generate_interface]
+    pub fn to_string(&self) -> String {
+        unsafe { serde_json::to_string(self).unwrap_unchecked() }
     }
 }
 

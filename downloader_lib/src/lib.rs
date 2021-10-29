@@ -1,3 +1,5 @@
+#![feature(option_result_unwrap_unchecked)]
+
 mod download_callback;
 mod download_info;
 mod errors;
@@ -64,7 +66,7 @@ impl Downloader {
                     return RequestInfo::new(
                         download_info.clone(),
                         filename,
-                        val.content_length().map(|i| i as i64),
+                        val.content_length().unwrap_or_default() as i64,
                         type_of_file,
                         val.headers().contains_key(ACCEPT_RANGES),
                     )

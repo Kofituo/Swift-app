@@ -1,5 +1,7 @@
 package com.example.swift_final.ui.home
 
+import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -62,6 +64,10 @@ fun DownloadInfoDialog(
     var enable by rememberSaveable { mutableStateOf(false) }
     var typeOfFile: TypeOfFile? by rememberSaveable { mutableStateOf(null) }
     val showSimmer = !enable
+    //request info parameters
+    var fileSizeInBytes by rememberSaveable { mutableStateOf(0L) }
+    var isResumable by rememberSaveable { mutableStateOf(false) }
+
     Dialog(
         onDismissRequest = { setShowDialog(null) },
         properties = dialogProperties
@@ -232,7 +238,28 @@ fun DownloadInfoDialog(
                     }
                 }
                 OutlinedButton(
-                    onClick = { /*TODO*/ },
+                    onClick = {
+                        // send request can be false when the error dialog is showing
+                        // but that shouldn't be a problem since the download button won't
+                        // even show in the first place
+                        if (sendRequest) {
+                            Toast.makeText(
+                                ApplicationLoader.applicationContext,
+                                R.string.loading,
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        } else {
+                            RequestInfo(
+                                downloadInfo.copy(),
+                                filename.value,
+                                fileSizeInBytes,
+                                TypeOfFile.valueOf(category.value),
+                                isResumable
+                            ).let {
+                                Log.e("req", it.toString())
+                            }
+                        }
+                    },
                     modifier =
                     Modifier
                         .layoutId(ConstraintIds.Ok)
@@ -318,6 +345,10 @@ fun DownloadInfoDialog(
                         ApplicationLoader.getString(id = if (info.isResumable) R.string.yes else R.string.no)
                     typeOfFile = info.typeOfFile()
                     enable = true
+                    //
+                    isResumable = info.isResumable
+                    fileSizeInBytes = info.fileSizeInBytes
+                    Log.e("res fi", "$isResumable size $fileSizeInBytes")
                 }
             }
         }

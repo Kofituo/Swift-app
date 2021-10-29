@@ -4,7 +4,7 @@ use crate::get_type_sc;
 use rifgen::rifgen_attr::*;
 
 #[generate_interface]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, serde::Serialize, serde::Deserialize)]
 pub enum TypeOfFile {
     Word,
     Excel,
