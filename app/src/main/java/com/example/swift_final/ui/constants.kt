@@ -15,9 +15,12 @@ const val FrontPageExtraButtonsSize = 85
 const val AddUrlImageSize = 60
 const val FrontPageExtraImageSize = 35
 inline val textFieldShape get() = RoundedCornerShape(TextFieldRadius.dp)
+
 @OptIn(ExperimentalComposeUiApi::class)
-inline val dialogProperties get() = DialogProperties(usePlatformDefaultWidth = false)
+inline val dialogProperties
+    get() = DialogProperties(usePlatformDefaultWidth = false)
 const val DialogWidth = 90f
 const val DrawerRadius = 30f
 const val DrawerButtonPadding = 13
 val defaultFontSize = 14.sp
+var numberOfThreads: Byte = 8

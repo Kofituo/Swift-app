@@ -2,6 +2,26 @@
 use crate::*;
 use jni_sys::*;
 foreign_enum!(
+	enum ResponseErrors {
+		ErrorParsingRequest = ResponseErrors::ErrorParsingRequest,
+		UnableToDecodeRequest = ResponseErrors::UnableToDecodeRequest,
+		RedirectedManyTimes = ResponseErrors::RedirectedManyTimes,
+		ConnectionTimeout = ResponseErrors::ConnectionTimeout,
+		UnknownError = ResponseErrors::UnknownError,
+	}
+);
+foreign_enum!(
+	enum FileCategory {
+		Video = FileCategory::Video,
+		Document = FileCategory::Document,
+		Image = FileCategory::Image,
+		Compressed = FileCategory::Compressed,
+		Audio = FileCategory::Audio,
+		Application = FileCategory::Application,
+		Other = FileCategory::Other,
+	}
+);
+foreign_enum!(
 	enum TypeOfFile {
 		Word = TypeOfFile::Word,
 		Excel = TypeOfFile::Excel,
@@ -27,26 +47,6 @@ foreign_enum!(
 		Compressed = TypeOfFile::Compressed,
 	}
 );
-foreign_enum!(
-	enum FileCategory {
-		Video = FileCategory::Video,
-		Document = FileCategory::Document,
-		Image = FileCategory::Image,
-		Compressed = FileCategory::Compressed,
-		Audio = FileCategory::Audio,
-		Application = FileCategory::Application,
-		Other = FileCategory::Other,
-	}
-);
-foreign_enum!(
-	enum ResponseErrors {
-		ErrorParsingRequest = ResponseErrors::ErrorParsingRequest,
-		UnableToDecodeRequest = ResponseErrors::UnableToDecodeRequest,
-		RedirectedManyTimes = ResponseErrors::RedirectedManyTimes,
-		ConnectionTimeout = ResponseErrors::ConnectionTimeout,
-		UnknownError = ResponseErrors::UnknownError,
-	}
-);
 foreign_class!(
 	class FileType {
 		self_type FileType;
@@ -66,7 +66,6 @@ foreign_class!(
 		self_type DownloadInfo;
 		constructor DownloadInfo::constructor(url : String , auth : Option < Authentication >)->DownloadInfo;
 		fn DownloadInfo::get_url(& self)->&str; alias getUrl;
-		fn DownloadInfo::copy(& self)->DownloadInfo; alias copy;
 	}
 );
 foreign_class!(

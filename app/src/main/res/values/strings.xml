@@ -46,4 +46,11 @@
     <string name="title_activity_unfinished_downloads">UnfinishedDownloadsActivity</string>
     <string name="no_uncompleted_downloads">"    You have no uncompleted downloads"</string>
     <string name="loading">Loading… Please wait</string>
+    <string name="no_storage">Not Enough Storage</string>
+    <string name="no_storage_info">You do not have enough storage to download this file</string>
+    <string name="proceed">Proceed</string>
+    <string name="file_already_exists">The file already exists</string>
+    <string name="resume_download">Resume download</string>
+    <string name="duplicate_download">Duplicate download</string>
+    <string name="overwrite_existing">Overwrite the existing file</string>
 </resources>

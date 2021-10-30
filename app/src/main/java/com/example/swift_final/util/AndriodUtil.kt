@@ -2,6 +2,7 @@ package com.example.swift_final.util
 
 import android.content.ClipDescription
 import android.content.Context
+import android.content.Intent
 import android.content.SharedPreferences
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Spacer
@@ -67,8 +68,18 @@ inline fun <reified T> SharedPreferences.get(key: String, block: T.() -> Unit = 
 fun sharedPreferences(key: String) =
     LocalContext.current.getSharedPreferences(key, Context.MODE_PRIVATE)
 
+fun Context.sharedPreferences(key: String) =
+    getSharedPreferences(key, Context.MODE_PRIVATE)
+
 object SharedPreferencesConstants {
     /*** Identifier to receive the list of unfinished downloads ***/
     const val UnfinishedDownloads = "$APP_NAME.unfinished download"
     const val HasDownloads = "has downloads"
 }
+
+/* Intent builder*/
+/**
+ * Creates a new [Intent] and applies [block] to it
+ */
+inline fun <reified T> Context.buildIntent(block: Intent.() -> Unit) =
+    Intent(this, T::class.java).apply(block)

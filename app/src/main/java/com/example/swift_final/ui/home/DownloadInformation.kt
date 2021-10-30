@@ -1,10 +1,15 @@
 package com.example.swift_final.ui.home
 
+import android.content.Context
+import android.os.Build
+import android.os.Parcelable
+import android.os.storage.StorageManager
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.*
@@ -25,22 +30,34 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.ConstraintSet
 import androidx.constraintlayout.compose.Dimension
+import androidx.core.content.edit
+import androidx.core.content.getSystemService
+import androidx.navigation.NavController
 import com.example.swift_final.ApplicationLoader
 import com.example.swift_final.R
+import com.example.swift_final.Screens
 import com.example.swift_final.lib.*
 import com.example.swift_final.ui.*
 import com.example.swift_final.ui.shimmer.shimmer
-import com.example.swift_final.util.DisplayUtils
+import com.example.swift_final.ui.unfinished_downloads.DownloadService
+import com.example.swift_final.ui.unfinished_downloads.UnfinishedDownloadData
+import com.example.swift_final.ui.unfinished_downloads.UnfinishedPage
+import com.example.swift_final.util.*
 import com.example.swift_final.util.DisplayUtils.ScreenPixels.Companion.widthInDp
-import com.example.swift_final.util.HorizontalSpacer
-import com.example.swift_final.util.textFieldBorder
 import kotlinx.coroutines.*
-import java.io.Serializable
+import kotlinx.parcelize.Parcelize
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
+import java.io.File
 import java.util.*
+import kotlin.collections.ArrayList
 import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalTime::class)
@@ -51,7 +68,8 @@ fun DownloadInfoDialog(
     setShowDialog: (DownloadInfo?) -> Unit,
     sendRequest: Boolean,
     setSendRequest: (Boolean) -> Unit,
-    setSuccess: () -> Unit
+    setSuccess: () -> Unit,
+    navController: NavController
 ) {
     if (!showDialog) return
     requireNotNull(downloadInfo)
@@ -67,6 +85,13 @@ fun DownloadInfoDialog(
     //request info parameters
     var fileSizeInBytes by rememberSaveable { mutableStateOf(0L) }
     var isResumable by rememberSaveable { mutableStateOf(false) }
+    var showNoSpaceDialog by rememberSaveable { mutableStateOf(false) }
+    var isDuplicate by rememberSaveable { mutableStateOf(-1) }
+
+    val onDuplicateFile = { int: Int ->
+        isDuplicate = int
+    }
+
 
     Dialog(
         onDismissRequest = { setShowDialog(null) },
@@ -249,14 +274,30 @@ fun DownloadInfoDialog(
                                 Toast.LENGTH_SHORT
                             ).show()
                         } else {
-                            RequestInfo(
-                                downloadInfo.copy(),
-                                filename.value,
-                                fileSizeInBytes,
-                                TypeOfFile.valueOf(category.value),
-                                isResumable
-                            ).let {
-                                Log.e("req", it.toString())
+                            //first check if there's enough space
+                            // if there's isn't show dialog to either proceed or cancel
+                            // for each download we need 1/number of threads more space
+                            // since when we're done downloading, copying then deletes obviously
+                            // creates a copy of size (1/numberOfThreads) * size
+                            // for now we're writing only to internal storage
+                            // TODO write to external storage too
+                            MainScope().launch {
+                                val shouldProceed = checkFilesize(fileSizeInBytes)
+                                if (!shouldProceed) {
+                                    // show error dialog
+                                    showNoSpaceDialog = true
+                                } else {
+                                    if (checkDownload(
+                                            filename.value,
+                                            fileSizeInBytes,
+                                            FileCategory.valueOf(category.value),
+                                            isResumable,
+                                            onDuplicateFile
+                                        )
+                                    ) {
+                                        setShowDialog(null)
+                                    }
+                                }
                             }
                         }
                     },
@@ -276,13 +317,18 @@ fun DownloadInfoDialog(
         }
     }
 
-    var errorDialogData: ErrorDialogData? by rememberSaveable { mutableStateOf(null) }
+    //constants for error dialog
+    var errorTitle by rememberSaveable { mutableStateOf("") }
+
+    var errorResendRequest by rememberSaveable { mutableStateOf(false) }
+    var errorBody: String? by rememberSaveable { mutableStateOf(null) }
+    var errorConfirmButtonText by rememberSaveable { mutableStateOf("") }
+    var errorDismissButtonText: String? by rememberSaveable { mutableStateOf(null) }
 
     if (sendRequest) {
-        errorDialogData = null
+        errorBody = null
         LaunchedEffect(true) {
             val callback = object : DownloadCallback {
-                var shouldDismiss = true
                 override fun responseError(error: ResponseErrors) {
                     val resId = when (error) {
                         ResponseErrors.ConnectionTimeout -> R.string.timeout
@@ -290,42 +336,20 @@ fun DownloadInfoDialog(
                         ResponseErrors.RedirectedManyTimes -> R.string.redirected_many
                         ResponseErrors.UnknownError -> R.string.unknown_error
                     }
-                    errorDialogData = ErrorDialogData(
-                        body = ApplicationLoader.getString(resId),
-                        onDialogDismiss = {
-                            errorDialogData = null
-                            if (shouldDismiss) setShowDialog(null)
-                        },
-                        confirmButtonText = ApplicationLoader.getString(R.string.retry),
-                        confirmButtonCallback = {
-                            errorDialogData = null
-                            setSendRequest(true)
-                            shouldDismiss = false
-                        },
-                        dismissButtonText = ApplicationLoader.getString(R.string.cancel),
-                        dismissButtonCallback = {
-                            errorDialogData = null
-                            setShowDialog(null)
-                        })
+                    errorTitle = ApplicationLoader.applicationContext.getString(R.string.error)
+                    errorConfirmButtonText = ApplicationLoader.getString(R.string.retry)
+                    errorResendRequest = true
+                    errorDismissButtonText = ApplicationLoader.getString(R.string.cancel)
+                    errorBody = ApplicationLoader.getString(resId)
                 }
 
                 override fun statusError(error_code: Int, reason: String) {
                     //no retry
                     setSuccess()
-                    errorDialogData = ErrorDialogData(
-                        title = "${ApplicationLoader.getString(R.string.status_code)} $error_code",
-                        body = "${ApplicationLoader.getString(R.string.reason)} $reason",
-                        onDialogDismiss = {
-                            errorDialogData = null
-                            setShowDialog(null)
-                        },
-                        confirmButtonText = ApplicationLoader.getString(R.string.cancel),
-                        confirmButtonCallback = {
-                            errorDialogData = null
-                            setShowDialog(null)
-                            //sendRequest = true no retry
-                        }
-                    )
+                    errorTitle = "${ApplicationLoader.getString(R.string.status_code)} $error_code"
+                    errorConfirmButtonText = ApplicationLoader.getString(R.string.cancel)
+                    errorResendRequest = false
+                    errorBody = "${ApplicationLoader.getString(R.string.reason)} $reason"
                 }
 
                 override fun isActive() = this@LaunchedEffect.isActive
@@ -336,7 +360,7 @@ fun DownloadInfoDialog(
                 if (info != null) {
                     //success
                     setSuccess()
-                    errorDialogData = null
+                    errorBody = null // necessary??
                     filename.value = info.filename()
                     filesize.value =
                         info.fileSize ?: ApplicationLoader.getString(id = R.string.unknown_size)
@@ -353,28 +377,184 @@ fun DownloadInfoDialog(
             }
         }
     }
-    errorDialogData?.also {
+    errorBody?.also {
         ErrorDialog(
-            title = it.title,
-            body = it.body,
-            onDialogDismiss = it.onDialogDismiss,
-            confirmButtonText = it.confirmButtonText,
-            confirmButtonCallback = it.confirmButtonCallback,
-            dismissButtonText = it.dismissButtonText,
-            dismissButtonCallback = it.dismissButtonCallback
+            title = errorTitle,
+            body = it,
+            onDialogDismiss = {
+                // errorBody not being null means no button was clicked i.e the user tapped
+                // out the dialog
+                if (!errorResendRequest || errorBody != null) {
+                    setShowDialog(null)
+                    errorBody = null
+                }
+            },
+            confirmButtonText = errorConfirmButtonText,
+            confirmButtonCallback = {
+                errorBody = null
+                if (errorResendRequest) setSendRequest(true) else setShowDialog(null)
+            },
+            dismissButtonText = errorDismissButtonText,
+            dismissButtonCallback = errorDismissButtonText?.let {
+                {
+                    errorBody = null
+                    setShowDialog(null)
+                }
+            }
         )
+    }
+    if (showNoSpaceDialog) {
+        ErrorDialog(
+            title = stringResource(id = R.string.no_storage),
+            body = stringResource(id = R.string.no_storage_info),
+            onDialogDismiss = {
+                showNoSpaceDialog = false
+            },
+            confirmButtonText = stringResource(id = R.string.proceed),
+            confirmButtonCallback = {
+                showNoSpaceDialog = false
+                setShowDialog(null)
+                checkDownload(
+                    filename.value,
+                    fileSizeInBytes,
+                    FileCategory.valueOf(category.value),
+                    isResumable,
+                    onDuplicateFile
+                )
+            },
+            dismissButtonText = stringResource(id = R.string.cancel),
+            dismissButtonCallback = {
+                showNoSpaceDialog = false
+            }
+        )
+    }
+    // show error dialog if duplicate
+    if (isDuplicate != -1) {
+        when (isDuplicate) {
+            UNFINISHED -> {
+                DuplicateFileErrorDialog(
+                    listOfOptions = listOf(
+                        stringResource(id = R.string.resume_download),
+                        stringResource(id = R.string.duplicate_download)
+                    ),
+                    confirmButtonCallback = {
+                        TODO()
+                    },
+                    onDialogDismiss = { isDuplicate = -1 },
+                )
+            }
+            FINISHED -> {
+                DuplicateFileErrorDialog(
+                    listOfOptions = listOf(
+                        stringResource(id = R.string.duplicate_download),
+                        stringResource(id = R.string.overwrite_existing)
+                    ),
+                    confirmButtonCallback = {
+                        TODO()
+                    },
+                    onDialogDismiss = { isDuplicate = -1 },
+                )
+            }
+            ONGOING -> {
+                setShowDialog(null)
+                navController.navigateSingleTop(
+                    UnfinishedPage.getIntentString(
+                        filename.value,
+                        category.value,
+                        fileSizeInBytes
+                    )
+                )
+            }
+            else -> TODO()
+        }
     }
 }
 
-data class ErrorDialogData(
-    var title: String = ApplicationLoader.getString(id = R.string.error),
-    var body: String,
-    var onDialogDismiss: () -> Unit,
-    var confirmButtonText: String,
-    var confirmButtonCallback: () -> Unit,
-    var dismissButtonText: String? = null,
-    var dismissButtonCallback: (() -> Unit)? = null,
-) : Serializable
+@Composable
+private fun DuplicateFileErrorDialog(
+    listOfOptions: List<String>,
+    confirmButtonCallback: (Int) -> Unit,
+    onDialogDismiss: () -> Unit,
+) {
+    var selected by rememberSaveable { mutableStateOf(0) }
+    AlertDialog(
+        onDismissRequest = onDialogDismiss,
+        confirmButton = {
+            TextButton(onClick = { confirmButtonCallback(selected) }) {
+                Text(text = stringResource(id = android.R.string.ok))
+            }
+        },
+        title = {
+            Row {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_baseline_error_outline_24),
+                    contentDescription = stringResource(id = R.string.error_icon),
+                    tint = Color.Unspecified
+                )
+                HorizontalSpacer(space = 10)
+                Text(text = stringResource(id = R.string.file_already_exists))
+            }
+        },
+        text = {
+            Column {
+                listOfOptions.forEachIndexed { index, s ->
+                    val interaction = remember { MutableInteractionSource() }
+                    val onSelected = { selected = index }
+                    Row(
+                        modifier = Modifier
+                            .padding(top = 10.dp)
+                            .clickable(interaction, indication = null, onClick = onSelected)
+                    ) {
+                        RadioButton(
+                            selected = selected == index,
+                            onClick = onSelected,
+                            interactionSource = interaction
+                        )
+                        HorizontalSpacer(space = 16)
+                        Text(text = s, fontSize = 15.sp)
+                    }
+                }
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDialogDismiss) {
+                Text(text = stringResource(id = R.string.cancel))
+            }
+        }
+    )
+}
+
+/**
+ * Returns whether the download should proceed
+ * */
+private suspend fun checkFilesize(size: Long): Boolean {
+    if (size == 0L) return true //unknown file size, proceed regardless
+    return withContext(Dispatchers.IO) {
+        val spaceRequired = (1 + (1.0 / numberOfThreads)) * size
+        val usableSpace =
+            runCatching {
+                ApplicationLoader.applicationContext.filesDir.usableSpace
+            }.getOrElse {
+                return@withContext true // can't get current space, proceed regardless
+            }
+        if (spaceRequired >= usableSpace) {
+            // low space
+            // see if getAllocatableBytes can do the trick
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                ApplicationLoader.applicationContext.getSystemService<StorageManager>()
+                    ?.run {
+                        return@withContext runCatching {
+                            getAllocatableBytes(
+                                getUuidForPath(ApplicationLoader.applicationContext.filesDir)
+                            )
+                        }.getOrElse { return@withContext false } > spaceRequired
+                    }
+            }
+        }
+        usableSpace > spaceRequired
+    }
+
+}
 
 private fun getImageId(typeOfFile: TypeOfFile?) =
     when (typeOfFile) {
@@ -445,7 +625,108 @@ private fun ErrorDialog(
     )
 }
 
-//TODO
+
+private const val UNFINISHED = 0
+private const val FINISHED = 1
+private const val ONGOING = 2
+
+@OptIn(ExperimentalSerializationApi::class)
+private fun checkDownload(
+    filename: String,
+    file_size: Long,
+    category: FileCategory,
+    resumable: Boolean,
+    onDuplicateFile: (Int) -> Unit
+): Boolean {
+    // write to share preferences so Unfinished Page can read it
+    val context = ApplicationLoader.applicationContext
+    val sharedPreferences =
+        context.sharedPreferences(key = SharedPreferencesConstants.UnfinishedDownloads)
+    sharedPreferences.run {
+        val prefList =
+            get<String?>(category.name) // get the current list under this category
+                ?.let { Json.decodeFromString<MutableList<UnfinishedDownloadData>>(it) }
+                ?: ArrayList(1)
+        //check if it's a duplicate
+        // first check through the unfinished downloads
+        val data = prefList.find {
+            // no need to check the category since they should be the same
+            // check filesize first to speed things up
+            it.fileSize == file_size && it.filename == filename
+            // file name could be the same but different sizes??
+        }
+        // show dialog showing whether to resume download or duplicate
+        // download
+        if (data != null) {
+            // could be that the download is ongoing so open
+            // unfinished page and highlight the download
+            onDuplicateFile(if (data.ongoing) ONGOING else UNFINISHED)
+            return false
+        }
+        //check through the completed files folder
+        val duplicate = runCatching {
+            val dir =
+                ApplicationLoader.applicationContext.getDir(category.name, Context.MODE_PRIVATE)
+            File(dir, filename).exists()
+        }.getOrElse { false }
+        //
+        if (duplicate) {
+            onDuplicateFile(FINISHED)
+            return false
+        }
+        prefList.add(
+            UnfinishedDownloadData(
+                filename = filename,
+                fileSize = file_size,
+                fileCategory = category,
+                resumable = resumable,
+                ongoing = true,
+                timeStamp = Calendar.getInstance().time.time
+            )
+        )
+        edit {
+            putString(category.name, Json.encodeToString(prefList))
+        }
+        return true
+    }
+}
+
+@Parcelize
+data class DownloadIntentData(
+    val url: String,
+    val username: String?,
+    val password: String?,
+    val filename: String,
+    val fileSize: Long,
+    val category: FileCategory,
+    val resumable: Boolean
+) : Parcelable
+
+private fun startDownload(
+    url: String,
+    username: String?,
+    password: String?,
+    filename: String,
+    fileSize: Long,
+    category: FileCategory,
+    resumable: Boolean,
+    navController: NavController
+) {
+
+    ApplicationLoader.applicationContext.buildIntent<DownloadService> {
+        putExtra(
+            DownloadService.DownloadInfo,
+            DownloadIntentData(url, username, password, filename, fileSize, category, resumable)
+        )
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+            ApplicationLoader.applicationContext.startForegroundService(this)
+        else
+            ApplicationLoader.applicationContext.startService(this)
+    }
+    // open unfinished downloads
+    navController.navigate(Screens.UnfinishedDownloads.name)
+}
+
 private fun constraints(isLandscape: Boolean) = ConstraintSet {
     val title = createRefFor(ConstraintIds.Title)
     val divider = createRefFor(ConstraintIds.Divider)

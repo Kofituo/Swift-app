@@ -91,7 +91,8 @@ fun FrontPageContent(navController: NavController,openDrawer:() -> Unit, padding
                 setShowDialog = downloadInfoViewModel.setShowDialog,
                 sendRequest = sendRequest,
                 setSendRequest = downloadInfoViewModel.setSendRequest,
-                setSuccess = downloadInfoViewModel.setSuccess
+                setSuccess = downloadInfoViewModel.setSuccess,
+                navController = navController
             )
             OutlinedButton(
                 onClick = { dialogViewModel.setShowDialog(true) },
