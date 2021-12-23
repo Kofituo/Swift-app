@@ -1,9 +1,7 @@
 use crate::filetypes::{FileType, TypeOfFile};
 use crate::to_bytes_format;
-use derive_new::new;
 use log::Level;
 use rifgen::rifgen_attr::*;
-use std::time::Instant;
 
 #[generate_interface_doc]
 #[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]

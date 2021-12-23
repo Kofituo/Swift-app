@@ -63,7 +63,7 @@ fun OnAddUrlClicked(dialogViewModel: DialogViewModel) {
                         start.linkTo(parent.start)
                         top.linkTo(topGuideline)
                     })
-                AddressField(dialogViewModel,Modifier.constrainAs(urlBox) {
+                AddressField(dialogViewModel, Modifier.constrainAs(urlBox) {
                     end.linkTo(parent.end)
                     start.linkTo(parent.start)
                     top.linkTo(title.bottom, topMargin)
@@ -189,7 +189,10 @@ private fun AddressField(dialogViewModel: DialogViewModel, modifier: Modifier) {
     val url by dialogViewModel.urlLiveData.observeAsState()
     val isError by dialogViewModel.isError.observeAsState(false)
     OutlinedTextField(
-        value = url ?: copiedUrl?.also { dialogViewModel.setUrl(it) } ?: "",
+        value = url ?: copiedUrl?.also {
+            dialogViewModel.setUrl(it)
+            if (isError) dialogViewModel.setIsError(isError = false)
+        } ?: "",
         onValueChange = {
             //means the user is updating the url
             dialogViewModel.setUrl(it)

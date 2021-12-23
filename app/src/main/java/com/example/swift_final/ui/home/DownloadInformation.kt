@@ -665,8 +665,7 @@ private fun checkDownload(
         }
         //check through the completed files folder
         val duplicate = runCatching {
-            val dir =
-                ApplicationLoader.applicationContext.getDir(category.name, Context.MODE_PRIVATE)
+            val dir = context.getDir(category.name, Context.MODE_PRIVATE)
             File(dir, filename).exists()
         }.getOrElse { false }
         //
@@ -712,7 +711,6 @@ private fun startDownload(
     resumable: Boolean,
     navController: NavController
 ) {
-
     ApplicationLoader.applicationContext.buildIntent<DownloadService> {
         putExtra(
             DownloadService.DownloadInfo,
@@ -730,7 +728,7 @@ private fun startDownload(
 private fun constraints(isLandscape: Boolean) = ConstraintSet {
     val title = createRefFor(ConstraintIds.Title)
     val divider = createRefFor(ConstraintIds.Divider)
-    val shimmerLayout = if (!isLandscape) createRefFor(ConstraintIds.ShimmerLayout) else null
+    val shimmerLayout = if (isLandscape) null else createRefFor(ConstraintIds.ShimmerLayout)
     val downloadButton = createRefFor(ConstraintIds.DownloadButton)
     //Guidelines
     val topGuide = createGuidelineFromTop(0.04f)
