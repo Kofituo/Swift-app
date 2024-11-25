@@ -10,14 +10,14 @@ crate-type = ["cdylib"]
 
 
 [dependencies]
-rifgen = "*"
-jni-sys = "*"
+rifgen = "0.1.61"
+jni-sys = "0.4.0"
 log = "*"
 log-panics="*"
 android_logger = "*"
 serde_json = "*"
 serde = { version = "*", features = ["derive"] }
-derive-new = "*"
+derive-new = "0.7.0"
 reqwest = {version = "*", features = ["blocking"] }
 openssl = { version = "*", features = ["vendored"] }
 percent-encoding = "*"
@@ -27,4 +27,4 @@ byte-unit = "*"
 
 [build-dependencies]
 rifgen = "*"
-flapigen = { git = "https://github.com/Dushistov/flapigen-rs", rev = "fa3cd2c4d411f7e1eab7e0c17357a1d8a918c9b2" }
+flapigen = { git = "https://github.com/Dushistov/flapigen-rs"}
