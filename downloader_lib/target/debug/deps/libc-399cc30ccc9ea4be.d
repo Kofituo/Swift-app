@@ -1,0 +1,11 @@
+C:\Users\Otuo\Documents\Knotuo\Projects\Android\Swift-app\downloader_lib\target\debug\deps\liblibc-399cc30ccc9ea4be.rmeta: C:\Users\Otuo\.cargo\registry\src\index.crates.io-6f17d22bba15001f\libc-0.2.165\src/lib.rs C:\Users\Otuo\.cargo\registry\src\index.crates.io-6f17d22bba15001f\libc-0.2.165\src\macros.rs C:\Users\Otuo\.cargo\registry\src\index.crates.io-6f17d22bba15001f\libc-0.2.165\src\fixed_width_ints.rs C:\Users\Otuo\.cargo\registry\src\index.crates.io-6f17d22bba15001f\libc-0.2.165\src\windows\mod.rs C:\Users\Otuo\.cargo\registry\src\index.crates.io-6f17d22bba15001f\libc-0.2.165\src\windows\msvc\mod.rs
+
+C:\Users\Otuo\Documents\Knotuo\Projects\Android\Swift-app\downloader_lib\target\debug\deps\liblibc-399cc30ccc9ea4be.rlib: C:\Users\Otuo\.cargo\registry\src\index.crates.io-6f17d22bba15001f\libc-0.2.165\src/lib.rs C:\Users\Otuo\.cargo\registry\src\index.crates.io-6f17d22bba15001f\libc-0.2.165\src\macros.rs C:\Users\Otuo\.cargo\registry\src\index.crates.io-6f17d22bba15001f\libc-0.2.165\src\fixed_width_ints.rs C:\Users\Otuo\.cargo\registry\src\index.crates.io-6f17d22bba15001f\libc-0.2.165\src\windows\mod.rs C:\Users\Otuo\.cargo\registry\src\index.crates.io-6f17d22bba15001f\libc-0.2.165\src\windows\msvc\mod.rs
+
+C:\Users\Otuo\Documents\Knotuo\Projects\Android\Swift-app\downloader_lib\target\debug\deps\libc-399cc30ccc9ea4be.d: C:\Users\Otuo\.cargo\registry\src\index.crates.io-6f17d22bba15001f\libc-0.2.165\src/lib.rs C:\Users\Otuo\.cargo\registry\src\index.crates.io-6f17d22bba15001f\libc-0.2.165\src\macros.rs C:\Users\Otuo\.cargo\registry\src\index.crates.io-6f17d22bba15001f\libc-0.2.165\src\fixed_width_ints.rs C:\Users\Otuo\.cargo\registry\src\index.crates.io-6f17d22bba15001f\libc-0.2.165\src\windows\mod.rs C:\Users\Otuo\.cargo\registry\src\index.crates.io-6f17d22bba15001f\libc-0.2.165\src\windows\msvc\mod.rs
+
+C:\Users\Otuo\.cargo\registry\src\index.crates.io-6f17d22bba15001f\libc-0.2.165\src/lib.rs:
+C:\Users\Otuo\.cargo\registry\src\index.crates.io-6f17d22bba15001f\libc-0.2.165\src\macros.rs:
+C:\Users\Otuo\.cargo\registry\src\index.crates.io-6f17d22bba15001f\libc-0.2.165\src\fixed_width_ints.rs:
+C:\Users\Otuo\.cargo\registry\src\index.crates.io-6f17d22bba15001f\libc-0.2.165\src\windows\mod.rs:
+C:\Users\Otuo\.cargo\registry\src\index.crates.io-6f17d22bba15001f\libc-0.2.165\src\windows\msvc\mod.rs:

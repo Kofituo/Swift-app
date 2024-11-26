@@ -1,0 +1,10 @@
+C:\Users\Otuo\Documents\Knotuo\Projects\Android\Swift-app\downloader_lib\target\aarch64-linux-android\debug\deps\librustls_pki_types-7a39a36027a6f592.rmeta: C:\Users\Otuo\.cargo\registry\src\index.crates.io-6f17d22bba15001f\rustls-pki-types-1.10.0\src/lib.rs C:\Users\Otuo\.cargo\registry\src\index.crates.io-6f17d22bba15001f\rustls-pki-types-1.10.0\src\base64.rs C:\Users\Otuo\.cargo\registry\src\index.crates.io-6f17d22bba15001f\rustls-pki-types-1.10.0\src\server_name.rs C:\Users\Otuo\.cargo\registry\src\index.crates.io-6f17d22bba15001f\rustls-pki-types-1.10.0\src\pem.rs
+
+C:\Users\Otuo\Documents\Knotuo\Projects\Android\Swift-app\downloader_lib\target\aarch64-linux-android\debug\deps\librustls_pki_types-7a39a36027a6f592.rlib: C:\Users\Otuo\.cargo\registry\src\index.crates.io-6f17d22bba15001f\rustls-pki-types-1.10.0\src/lib.rs C:\Users\Otuo\.cargo\registry\src\index.crates.io-6f17d22bba15001f\rustls-pki-types-1.10.0\src\base64.rs C:\Users\Otuo\.cargo\registry\src\index.crates.io-6f17d22bba15001f\rustls-pki-types-1.10.0\src\server_name.rs C:\Users\Otuo\.cargo\registry\src\index.crates.io-6f17d22bba15001f\rustls-pki-types-1.10.0\src\pem.rs
+
+C:\Users\Otuo\Documents\Knotuo\Projects\Android\Swift-app\downloader_lib\target\aarch64-linux-android\debug\deps\rustls_pki_types-7a39a36027a6f592.d: C:\Users\Otuo\.cargo\registry\src\index.crates.io-6f17d22bba15001f\rustls-pki-types-1.10.0\src/lib.rs C:\Users\Otuo\.cargo\registry\src\index.crates.io-6f17d22bba15001f\rustls-pki-types-1.10.0\src\base64.rs C:\Users\Otuo\.cargo\registry\src\index.crates.io-6f17d22bba15001f\rustls-pki-types-1.10.0\src\server_name.rs C:\Users\Otuo\.cargo\registry\src\index.crates.io-6f17d22bba15001f\rustls-pki-types-1.10.0\src\pem.rs
+
+C:\Users\Otuo\.cargo\registry\src\index.crates.io-6f17d22bba15001f\rustls-pki-types-1.10.0\src/lib.rs:
+C:\Users\Otuo\.cargo\registry\src\index.crates.io-6f17d22bba15001f\rustls-pki-types-1.10.0\src\base64.rs:
+C:\Users\Otuo\.cargo\registry\src\index.crates.io-6f17d22bba15001f\rustls-pki-types-1.10.0\src\server_name.rs:
+C:\Users\Otuo\.cargo\registry\src\index.crates.io-6f17d22bba15001f\rustls-pki-types-1.10.0\src\pem.rs:

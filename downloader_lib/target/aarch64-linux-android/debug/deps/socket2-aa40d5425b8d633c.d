@@ -1,0 +1,11 @@
+C:\Users\Otuo\Documents\Knotuo\Projects\Android\Swift-app\downloader_lib\target\aarch64-linux-android\debug\deps\libsocket2-aa40d5425b8d633c.rmeta: C:\Users\Otuo\.cargo\registry\src\index.crates.io-6f17d22bba15001f\socket2-0.5.7\src\lib.rs C:\Users\Otuo\.cargo\registry\src\index.crates.io-6f17d22bba15001f\socket2-0.5.7\src\sockaddr.rs C:\Users\Otuo\.cargo\registry\src\index.crates.io-6f17d22bba15001f\socket2-0.5.7\src\socket.rs C:\Users\Otuo\.cargo\registry\src\index.crates.io-6f17d22bba15001f\socket2-0.5.7\src\sockref.rs C:\Users\Otuo\.cargo\registry\src\index.crates.io-6f17d22bba15001f\socket2-0.5.7\src\sys\unix.rs
+
+C:\Users\Otuo\Documents\Knotuo\Projects\Android\Swift-app\downloader_lib\target\aarch64-linux-android\debug\deps\libsocket2-aa40d5425b8d633c.rlib: C:\Users\Otuo\.cargo\registry\src\index.crates.io-6f17d22bba15001f\socket2-0.5.7\src\lib.rs C:\Users\Otuo\.cargo\registry\src\index.crates.io-6f17d22bba15001f\socket2-0.5.7\src\sockaddr.rs C:\Users\Otuo\.cargo\registry\src\index.crates.io-6f17d22bba15001f\socket2-0.5.7\src\socket.rs C:\Users\Otuo\.cargo\registry\src\index.crates.io-6f17d22bba15001f\socket2-0.5.7\src\sockref.rs C:\Users\Otuo\.cargo\registry\src\index.crates.io-6f17d22bba15001f\socket2-0.5.7\src\sys\unix.rs
+
+C:\Users\Otuo\Documents\Knotuo\Projects\Android\Swift-app\downloader_lib\target\aarch64-linux-android\debug\deps\socket2-aa40d5425b8d633c.d: C:\Users\Otuo\.cargo\registry\src\index.crates.io-6f17d22bba15001f\socket2-0.5.7\src\lib.rs C:\Users\Otuo\.cargo\registry\src\index.crates.io-6f17d22bba15001f\socket2-0.5.7\src\sockaddr.rs C:\Users\Otuo\.cargo\registry\src\index.crates.io-6f17d22bba15001f\socket2-0.5.7\src\socket.rs C:\Users\Otuo\.cargo\registry\src\index.crates.io-6f17d22bba15001f\socket2-0.5.7\src\sockref.rs C:\Users\Otuo\.cargo\registry\src\index.crates.io-6f17d22bba15001f\socket2-0.5.7\src\sys\unix.rs
+
+C:\Users\Otuo\.cargo\registry\src\index.crates.io-6f17d22bba15001f\socket2-0.5.7\src\lib.rs:
+C:\Users\Otuo\.cargo\registry\src\index.crates.io-6f17d22bba15001f\socket2-0.5.7\src\sockaddr.rs:
+C:\Users\Otuo\.cargo\registry\src\index.crates.io-6f17d22bba15001f\socket2-0.5.7\src\socket.rs:
+C:\Users\Otuo\.cargo\registry\src\index.crates.io-6f17d22bba15001f\socket2-0.5.7\src\sockref.rs:
+C:\Users\Otuo\.cargo\registry\src\index.crates.io-6f17d22bba15001f\socket2-0.5.7\src\sys\unix.rs:

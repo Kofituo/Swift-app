@@ -28,6 +28,15 @@ foreign_enum!(
 	}
 );
 foreign_enum!(
+	enum ResponseErrors {
+		ErrorParsingRequest = ResponseErrors::ErrorParsingRequest,
+		UnableToDecodeRequest = ResponseErrors::UnableToDecodeRequest,
+		RedirectedManyTimes = ResponseErrors::RedirectedManyTimes,
+		ConnectionTimeout = ResponseErrors::ConnectionTimeout,
+		UnknownError = ResponseErrors::UnknownError,
+	}
+);
+foreign_enum!(
 	enum FileCategory {
 		Video = FileCategory::Video,
 		Document = FileCategory::Document,
@@ -38,19 +47,18 @@ foreign_enum!(
 		Other = FileCategory::Other,
 	}
 );
-foreign_enum!(
-	enum ResponseErrors {
-		ErrorParsingRequest = ResponseErrors::ErrorParsingRequest,
-		UnableToDecodeRequest = ResponseErrors::UnableToDecodeRequest,
-		RedirectedManyTimes = ResponseErrors::RedirectedManyTimes,
-		ConnectionTimeout = ResponseErrors::ConnectionTimeout,
-		UnknownError = ResponseErrors::UnknownError,
-	}
-);
 foreign_class!(
 	class Logger {
 		# [doc = "Set up logging"]
 		fn Logger::initialise_logging(); alias initialiseLogging;
+	}
+);
+foreign_class!(
+	class FileType {
+		self_type FileType;
+		constructor FileType::new(extension : & str)->FileType;
+		fn FileType::get_type(& self)->TypeOfFile; alias getType;
+		fn FileType::get_category(type_of_file : TypeOfFile)->FileCategory; alias getCategory;
 	}
 );
 foreign_class!(
@@ -92,13 +100,5 @@ foreign_callback!(
 foreign_class!(
 	class Downloader {
 		fn Downloader::get_request_info(download_info : & DownloadInfo , download_callback : & Box < dyn DownloadCallback > ,)->Option<RequestInfo>; alias getRequestInfo;
-	}
-);
-foreign_class!(
-	class FileType {
-		self_type FileType;
-		constructor FileType::new(extension : & str)->FileType;
-		fn FileType::get_type(& self)->TypeOfFile; alias getType;
-		fn FileType::get_category(type_of_file : TypeOfFile)->FileCategory; alias getCategory;
 	}
 );

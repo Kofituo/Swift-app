@@ -15,8 +15,7 @@ fn main() {
     let out_src = Path::new(&out_dir).join("java_glue.rs");
     //delete the lib folder then create it again to prevent obsolete files from staying
     let out_dir = path_buf!(
-        "/home/kofi/StudioProjects/Swift-app/app/src/main/java/com/example/swift_final/lib"
-    );
+"C:\\Users\\Otuo\\Documents\\Knotuo\\Projects\\Android\\Swift-app\\app\\src\\main\\java\\com\\example\\swift_final\\lib" );
     if out_dir.exists() {
         std::fs::remove_dir_all(&out_dir).unwrap();
     }
