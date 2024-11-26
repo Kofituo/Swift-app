@@ -84,7 +84,7 @@ dependencies {
 }
 
 // app/build.gradle
-def rustBasePath = "/home/kofi/StudioProjects/Swift-app/downloader_lib"
+def rustBasePath = "C:\\Users\\Otuo\\Documents\\Knotuo\\Projects\\Android\\Swift-app\\downloader_lib"
 def archTriplets = [
         'armeabi-v7a': 'armv7-linux-androideabi',
         'arm64-v8a': 'aarch64-linux-android',
@@ -109,7 +109,7 @@ archTriplets.each { arch, target ->
         }
     }*/
 
-    project.ext.cargo_target_directory = "/home/kofi/StudioProjects/Swift-app/downloader_lib/target"
+    project.ext.cargo_target_directory = "C:\\Users\\Otuo\\Documents\\Knotuo\\Projects\\Android\\Swift-app\\downloader_lib\\target"
     // Build with cargo
     tasks.create(name: "cargo-build-${arch}", type: Exec, description: "Building core for ${arch}") {
         workingDir rustBasePath
